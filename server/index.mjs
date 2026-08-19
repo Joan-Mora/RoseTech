@@ -175,6 +175,11 @@ if (process.env.TRUST_PROXY === "1") {
   app.set("trust proxy", 1);
 }
 
+const helmetExtras = {
+  crossOriginResourcePolicy: { policy: "same-origin" },
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+};
+
 const apiHelmet = helmet({
   contentSecurityPolicy: {
     useDefaults: false,
@@ -185,19 +190,45 @@ const apiHelmet = helmet({
       formAction: ["'none'"],
     },
   },
-  crossOriginResourcePolicy: { policy: "same-origin" },
-  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  ...helmetExtras,
 });
 
+// Keep in sync with the Content-Security-Policy meta in index.html (Maps, fonts).
 const siteHelmet = helmet({
   contentSecurityPolicy: {
     useDefaults: false,
     directives: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      objectSrc: ["'none'"],
+      formAction: ["'self'"],
       frameAncestors: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://maps.googleapis.com", "https://maps.gstatic.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "blob:",
+        "https://maps.googleapis.com",
+        "https://maps.gstatic.com",
+        "https://*.googleapis.com",
+        "https://*.gstatic.com",
+        "https://*.google.com",
+        "https://*.ggpht.com",
+      ],
+      connectSrc: [
+        "'self'",
+        "https://maps.googleapis.com",
+        "https://places.googleapis.com",
+        "ws:",
+        "wss:",
+      ],
+      frameSrc: ["https://www.google.com", "https://maps.google.com"],
+      workerSrc: ["'self'", "blob:"],
     },
   },
-  crossOriginResourcePolicy: { policy: "same-origin" },
-  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  ...helmetExtras,
 });
 
 app.use((req, res, next) => {
