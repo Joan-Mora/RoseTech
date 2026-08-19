@@ -1,0 +1,336 @@
+{
+  "meta": {
+    "title": "ROSE Technology | ROSE S.A.S.",
+    "description": "ROSE S.A.S. — Centro de Reparación y Optimización de Sistemas Empresariales. Soluciones tecnológicas integrales, Myshop, reparación y productos para empresas y pymes en Villavicencio, Meta."
+  },
+  "a11y": {
+    "skip": "Saltar al contenido",
+    "mainNav": "Principal",
+    "mobileNav": "Menú móvil",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "themeToLight": "Cambiar a tema claro",
+    "themeToDark": "Cambiar a tema oscuro",
+    "language": "Idioma",
+    "privacy": "Aviso de privacidad",
+    "coverageType": "Tipo de cobertura",
+    "coverageMap": "Mapa de área de cobertura",
+    "helpTopics": "Temas de ayuda",
+    "whatsapp": "WhatsApp"
+  },
+  "nav": {
+    "home": "Inicio",
+    "about": "Quiénes somos",
+    "services": "Servicios",
+    "software": "Myshop",
+    "products": "Productos",
+    "why": "Por qué",
+    "team": "Equipo",
+    "coverage": "Cobertura",
+    "contact": "Contacto",
+    "brochure": "Presentación",
+    "brochureLong": "Descargar presentación",
+    "contactCta": "Contactar"
+  },
+  "hero": {
+    "tagline": "Innovación, seguridad y calidad",
+    "lede": "Soluciones tecnológicas integrales para empresas y pymes en Villavicencio, Meta. Más de 5 años de experiencia, personal altamente capacitado y un compromiso inquebrantable con la calidad y la satisfacción de nuestros clientes.",
+    "ctaDiagnose": "Solicitar diagnóstico",
+    "ctaMyshop": "Conocer Myshop",
+    "ctaBrochure": "Descargar presentación",
+    "statYears": "+5 años",
+    "statYearsLabel": "Experiencia regional",
+    "statHours": "24 h",
+    "statHoursLabel": "Respuesta ágil",
+    "statFull": "360°",
+    "statFullLabel": "Servicio integral",
+    "logoAlt": "ROSE Technology"
+  },
+  "band": {
+    "hq": "Sede en {location}"
+  },
+  "about": {
+    "eyebrow": "01 · Quiénes somos",
+    "title": "Tecnología como aliado estratégico, no como problema.",
+    "lede": "ROSE S.A.S. es un proveedor colombiano de soluciones tecnológicas con sede en Villavicencio, Meta. Nos especializamos en reparación, optimización e implementación de sistemas, y en desarrollo de software para empresas, pymes y particulares. Atendemos reparaciones urgentes, mantenimiento preventivo programado, sistemas administrativos y cámaras de seguridad.",
+    "missionTitle": "Misión",
+    "mission": "Brindar soluciones tecnológicas integrales de reparación, mantenimiento y desarrollo de software a empresas y pymes de Villavicencio y el Meta, con personal altamente capacitado, garantizando calidad, confianza y optimización de los sistemas empresariales de nuestros clientes.",
+    "visionTitle": "Visión",
+    "vision": "Ser la empresa líder en servicios tecnológicos y soluciones digitales en la región del Meta, reconocida por nuestra excelencia técnica, innovación constante y compromiso con el desarrollo empresarial de nuestros clientes.",
+    "values": [
+      {
+        "title": "Experiencia",
+        "text": "+5 años en el sector tecnológico regional, con cientos de proyectos exitosos a lo largo de nuestra trayectoria."
+      },
+      {
+        "title": "Personal certificado",
+        "text": "Técnicos y desarrolladores en formación continua para ofrecer siempre las mejores soluciones del mercado."
+      },
+      {
+        "title": "Enfoque empresarial",
+        "text": "Soluciones diseñadas específicamente para las necesidades reales de pymes y empresas de la región."
+      },
+      {
+        "title": "Cobertura regional",
+        "text": "Atención especializada en Villavicencio y toda el área metropolitana del departamento del Meta."
+      }
+    ]
+  },
+  "services": {
+    "eyebrow": "02 · Reparación y mantenimiento",
+    "title": "El corazón de ROSE S.A.S. es el servicio técnico.",
+    "lede": "Cuando un equipo falla, su empresa pierde productividad, tiempo y dinero. Por eso ofrecemos reparación y mantenimiento rápido, confiable y con garantía, cubriendo una amplia gama de dispositivos electrónicos esenciales para el día a día de cualquier negocio moderno.",
+    "lede2": "Desde el primer contacto activamos un protocolo de diagnóstico inicial, presupuesto transparente, reparación con repuestos de calidad y pruebas exhaustivas antes de la entrega. Cada equipo que sale de nuestro taller pasa por un control de calidad riguroso. Trabajamos con todas las marcas y modelos, desde fallas simples hasta problemas complejos de hardware y software, con planes preventivos y correctivos para todo el año.",
+    "devices": [
+      {
+        "alt": "Placa base de torre con zócalo de CPU y ranuras de memoria en el taller",
+        "title": "Computadoras y torres",
+        "text": "Reparación de hardware, optimización de sistemas operativos, limpieza interna, cambio de componentes y mantenimiento preventivo para equipos de escritorio y torres personalizadas."
+      },
+      {
+        "alt": "Manos instalando un SSD en el interior de un portátil abierto",
+        "title": "Portátiles",
+        "text": "Diagnóstico y reparación de pantallas, teclados, baterías, conectores de carga, sobrecalentamiento y fallas de software en todas las marcas."
+      },
+      {
+        "alt": "Manos operando el panel de una impresora multifuncional de oficina",
+        "title": "Impresoras",
+        "text": "Mantenimiento correctivo y preventivo para inyección de tinta, láser y multifuncionales. Limpieza de cabezales, cambio de rodillos y solución de atascos."
+      },
+      {
+        "alt": "Técnico desarmando un celular para reparar pantalla y placa",
+        "title": "Celulares y tablets",
+        "text": "Cambio de pantallas, baterías, conectores de carga, cámaras y reparación de placa. Principales marcas, con repuestos originales y de alta calidad."
+      }
+    ],
+    "extras": [
+      {
+        "title": "Cámaras web y de seguridad",
+        "text": "Diagnóstico, reparación y configuración de cámaras web para videoconferencias y cámaras CCTV e IP. Instalación, cableado y monitoreo remoto para empresa o residencia."
+      },
+      {
+        "title": "Mantenimiento preventivo empresarial",
+        "text": "Planes periódicos para empresas con múltiples equipos: visitas programadas, limpieza, actualización de software, revisión de componentes y reporte del estado de cada dispositivo."
+      },
+      {
+        "title": "Diagnóstico sin compromiso",
+        "text": "Antes de cualquier reparación presentamos un diagnóstico completo y un presupuesto detallado. Sin sorpresas ni costos ocultos. Solo procedemos con su autorización expresa."
+      }
+    ]
+  },
+  "software": {
+    "eyebrow": "03 · Desarrollo de software",
+    "title": "Plataformas administrativas que transforman la operación.",
+    "lede": "ROSE S.A.S. no se limita a reparar equipos: transformamos la forma en que las empresas gestionan su operación interna. Nuestro equipo de desarrolladores construye sistemas a la medida y la plataforma estrella Myshop — Servicio Electrónico Administrativo, un sistema integral para que las pymes digitalicen su gestión diaria.",
+    "myshopTitle": "Myshop — Servicio Electrónico Administrativo",
+    "myshopIntro": "Plataforma integral para la gestión empresarial que incluye:",
+    "myshopItems": [
+      "Control de inventarios en tiempo real",
+      "Punto de venta (POS) integrado",
+      "Gestión de clientes y proveedores",
+      "Reportes financieros y estadísticos",
+      "Facturación electrónica compatible",
+      "Módulo de compras y órdenes",
+      "Control de usuarios y permisos",
+      "Acceso multi-dispositivo (web y móvil)"
+    ],
+    "myshopOutro": "Myshop está diseñado para ser intuitivo, robusto y escalable, creciendo junto con su empresa.",
+    "platform": "Plataforma:",
+    "customTitle": "Sistemas administrativos a medida",
+    "customIntro": "Software personalizado cuando las necesidades no las cubre un sistema estándar:",
+    "customItems": [
+      "Análisis detallado de sus procesos actuales",
+      "Diseño de solución adaptada a su flujo de trabajo",
+      "Desarrollo con tecnologías modernas y seguras",
+      "Capacitación completa para su equipo",
+      "Soporte técnico post-implementación",
+      "Actualizaciones y mejoras continuas"
+    ],
+    "customCta": "Solicite una demostración gratuita de Myshop o una cotización para su sistema personalizado",
+    "steps": [
+      { "code": "01 ANÁLISIS", "text": "Comprender las necesidades del cliente." },
+      { "code": "02 DISEÑO", "text": "Diseñar la solución técnica a medida." },
+      { "code": "03 DESARROLLO", "text": "Construir el sistema y sus módulos." },
+      { "code": "04 IMPLEMENTACIÓN", "text": "Desplegar y capacitar al equipo." }
+    ],
+    "process": "Nuestro proceso sigue una metodología clara y estructurada. Cada fase involucra al cliente, valida avances y asegura que el producto final supere sus expectativas."
+  },
+  "products": {
+    "eyebrow": "04 · Productos tecnológicos",
+    "title": "Aliado comercial para equipos y accesorios.",
+    "lede": "Contamos con un catálogo de productos de alta calidad, seleccionados por rendimiento, durabilidad y precio. Trabajamos con marcas reconocidas y garantizamos la autenticidad de todo lo que entregamos. El portafolio cubre oficinas empresariales y particulares que necesitan dispositivos confiables para trabajo o estudio. Cada producto pasa por verificación de calidad antes de la entrega.",
+    "items": [
+      {
+        "title": "Computadores y torres",
+        "text": "Equipos de escritorio nuevos y torres personalizadas según sus especificaciones. Desde equipos básicos de oficina hasta estaciones de alto rendimiento para diseño, programación o edición de video."
+      },
+      {
+        "title": "Portátiles",
+        "text": "Ultrabooks livianos, portátiles empresariales robustos y equipos gaming de última generación. Todas las marcas y modelos disponibles bajo pedido."
+      },
+      {
+        "title": "Cámaras de seguridad y webcams",
+        "text": "Sistemas CCTV e IP para hogar y empresa, con instalación incluida. Webcams de alta definición para videoconferencias, clases virtuales y transmisiones en vivo."
+      },
+      {
+        "title": "Celulares y tablets",
+        "text": "Dispositivos de las principales marcas, en distintos rangos de precio, con asesoría para elegir el equipo adecuado a su necesidad y presupuesto."
+      },
+      {
+        "title": "Audio y video",
+        "text": "Parlantes, audífonos, micrófonos y proyectores para oficinas, salas de reuniones y espacios comerciales. Soluciones audiovisuales completas."
+      },
+      {
+        "title": "Cables, adaptadores y periféricos",
+        "text": "Cables de red, HDMI, USB, adaptadores, extensiones, teclados, ratones, hubs y accesorios para operar sin interrupciones."
+      }
+    ],
+    "note": "Consulte nuestro catálogo completo actualizado. Ofrecemos precios especiales para compras al por mayor y empresas con necesidades de dotación tecnológica."
+  },
+  "why": {
+    "eyebrow": "05 · Por qué elegirnos",
+    "title": "¿Por qué elegir ROSE S.A.S.?",
+    "lede": "En un mercado con múltiples opciones, nos distinguimos por experiencia, compromiso y calidad. No somos solo un taller: somos un socio estratégico para el crecimiento tecnológico de su empresa. Durante más de cinco años hemos priorizado transparencia, eficiencia y resultados tangibles.",
+    "lede2": "Conocemos las necesidades de las pymes y empresas de Villavicencio y el Meta. Desde la rapidez ante una falla crítica hasta la asesoría para elegir tecnología, cada interacción está pensada para agregar valor. Un portafolio integral — reparación, mantenimiento, desarrollo de software y venta de productos — le permite un solo interlocutor confiable y reduce costos de coordinación.",
+    "stats": [
+      { "value": "+5 años", "text": "Sirviendo a empresas y particulares en Villavicencio y el Meta con excelencia técnica." },
+      { "value": "100%", "text": "Compromiso de calidad: cada trabajo se revisa y garantiza antes de la entrega." },
+      { "value": "24 h", "text": "Respuesta rápida, priorizando casos urgentes para minimizar el impacto operativo." },
+      { "value": "360°", "text": "Servicio integral: reparación, software y productos en un solo lugar." }
+    ],
+    "cards": [
+      { "title": "Transparencia total", "text": "Diagnóstico claro y presupuesto detallado antes de cualquier trabajo. Usted decide con plena información." },
+      { "title": "Garantía en todos los servicios", "text": "Reparaciones y productos con garantía escrita. Si algo no funciona como debe, lo resolvemos sin costo adicional." },
+      { "title": "Asesoría personalizada", "text": "No vendemos por vender. Le ayudamos a decidir con base en su presupuesto y objetivos." },
+      { "title": "Actualización continua", "text": "El personal se capacita en las últimas tecnologías, tendencias y metodologías del sector." }
+    ]
+  },
+  "team": {
+    "eyebrow": "Equipo",
+    "title": "Nuestro equipo de trabajo",
+    "lede": "El activo más valioso de ROSE S.A.S. es su gente: profesionales altamente capacitados en distintas especialidades, con formación técnica certificada y experiencia comprobada. Actualizamos conocimientos de forma continua y aplicamos un proceso riguroso de selección y formación interna antes de atender a un cliente.",
+    "techTitle": "Técnicos especializados",
+    "techText": "Reparación de hardware y sistemas electrónicos: computadores, dispositivos móviles, impresoras y seguridad.",
+    "techItems": [
+      "Certificación en hardware y electrónica",
+      "Especialización por categoría de equipo",
+      "Capacitación continua en nuevas tecnologías",
+      "Experiencia mínima de 3 años por técnico"
+    ],
+    "devTitle": "Desarrolladores de software",
+    "devText": "Ingenieros y programadores de sistemas administrativos, plataformas web y aplicaciones móviles, con metodologías ágiles.",
+    "devItems": [
+      "Ingenieros de sistemas y desarrolladores certificados",
+      "Experiencia en sistemas POS y administrativos",
+      "Metodologías ágiles (Scrum, Kanban)",
+      "Soporte y mantenimiento post-implementación"
+    ],
+    "cards": [
+      { "title": "Formación certificada", "text": "Todo el personal cuenta con certificaciones técnicas reconocidas y programas periódicos de actualización." },
+      { "title": "Trabajo en equipo", "text": "Coordinamos especialidades para proyectos que requieren una solución integral." },
+      { "title": "Atención al cliente", "text": "Formación para una experiencia positiva desde el primer contacto hasta la entrega final." },
+      { "title": "Confidencialidad", "text": "Todos los colaboradores firman acuerdos de confidencialidad para proteger la información y los datos de su empresa." }
+    ]
+  },
+  "coverage": {
+    "eyebrow": "Presencia",
+    "title": "Presencia y cobertura en el Meta",
+    "lede": "ROSE S.A.S. tiene su sede principal en Villavicencio, capital del departamento del Meta. Nuestra ubicación estratégica nos permite acompañar el crecimiento empresarial de la región y atender municipios cercanos. El Meta está en pleno desarrollo: nacimos para cubrir esa necesidad y hoy somos un referente tecnológico local, atentos a sus desafíos y oportunidades.",
+    "areaTitle": "Área de cobertura",
+    "areaLede": "Servicio en sitio para empresas con flotas de equipos y soporte remoto para software y configuraciones.",
+    "cities": [
+      "Villavicencio (sede principal)",
+      "Acacías, Restrepo y Cumaral",
+      "Granada, San Martín y Puerto López",
+      "Atención remota para todo el Meta"
+    ],
+    "onsiteTitle": "Servicio a domicilio empresarial",
+    "onsiteText": "Los técnicos se desplazan a las instalaciones del cliente para diagnóstico, reparación y mantenimiento, evitando interrumpir la operación.",
+    "onsiteNote": "Consulte disponibilidad para su zona. En el área urbana de Villavicencio no hay costo adicional de desplazamiento para empresas con contrato de mantenimiento.",
+    "audiences": [
+      { "title": "Empresas y pymes", "text": "Soluciones escalables, desde una sola oficina hasta múltiples sedes." },
+      { "title": "Particulares", "text": "Atención personalizada para hogares y profesionales independientes que necesitan soporte confiable." },
+      { "title": "Instituciones", "text": "Planes especiales para colegios, universidades y entidades con gran volumen de equipos." }
+    ],
+    "presencial": "Presencial",
+    "remoto": "Remoto",
+    "hintOnsite": "Cobertura en sitio por municipio, con polígonos OSM independientes (sin unirlos): perímetros urbanos de Villavicencio (sede), Puerto López, Acacías, Restrepo, Cumaral, Granada y San Martín.",
+    "hintRemote": "Cobertura remota en todo el departamento del Meta.",
+    "legendRemote": "Departamento del Meta",
+    "iframeOnsite": "Mapa de cobertura presencial",
+    "iframeRemote": "Mapa del departamento del Meta",
+    "errorTitle": "No se pudo cargar el mapa de cobertura",
+    "errorHint": "Verifique la clave de Maps y que Maps JavaScript API esté habilitada. Puede usar el mapa embebido o contactarnos por WhatsApp.",
+    "retry": "Reintentar",
+    "loading": "Cargando mapa…"
+  },
+  "contact": {
+    "eyebrow": "06 · Contacto y ubicación",
+    "title": "Contáctenos",
+    "lede": "Somos su aliado tecnológico para reparaciones urgentes, cotizaciones de equipamiento, demostraciones de Myshop o asesoría. Calidad, compromiso y respuesta ágil.",
+    "infoTitle": "Información de contacto",
+    "location": "Ubicación",
+    "phone": "Teléfono / WhatsApp",
+    "email": "Correo electrónico",
+    "myshop": "Plataforma Myshop",
+    "hours": "Horario de atención",
+    "hoursValue": "Lunes a sábado: 7:00 a. m. – 7:00 p. m.",
+    "formTitle": "¿Cómo podemos ayudarle?",
+    "formIntro": "Describa su necesidad y le enviaremos una propuesta concreta en un máximo de 24 horas hábiles.",
+    "promo": "Primer diagnóstico sin costo para nuevas empresas clientes. Contáctenos hoy mismo.",
+    "name": "Nombre",
+    "emailLabel": "Correo electrónico",
+    "phoneLabel": "Teléfono / WhatsApp",
+    "topicLabel": "¿Cómo podemos ayudarle?",
+    "topicPlaceholder": "Seleccione un tema",
+    "message": "Mensaje",
+    "messagePlaceholder": "Cuéntenos el equipo, el software o el resultado que necesita.",
+    "submit": "Enviar solicitud",
+    "sending": "Enviando…",
+    "success": "Recibimos su mensaje. Un asesor se comunicará pronto por WhatsApp o correo electrónico.",
+    "errName": "Indique su nombre completo.",
+    "errEmail": "Ingrese un correo electrónico válido.",
+    "errPhone": "Ingrese un teléfono o WhatsApp de contacto.",
+    "errTopic": "Seleccione cómo podemos ayudarle.",
+    "errMessage": "Describa su necesidad con un poco más de detalle.",
+    "errApi": "No hay conexión con la API de contacto. Ejecute npm run dev (api + web) o escríbanos por WhatsApp.",
+    "errSend": "No fue posible enviar el mensaje. Intente de nuevo o escríbanos por WhatsApp.",
+    "errNetwork": "No hay conexión con el servidor de contacto. Verifique que el sitio y la API estén en ejecución, o escríbanos por WhatsApp.",
+    "topics": {
+      "diagnostico": "Diagnóstico técnico",
+      "cotizacion": "Cotización de reparación o mantenimiento",
+      "myshop": "Demostración gratuita de Myshop",
+      "productos": "Cotización de productos tecnológicos",
+      "asesoria": "Asesoría en sistemas administrativos",
+      "mantenimiento": "Planes de mantenimiento empresarial"
+    }
+  },
+  "map": {
+    "errorTitle": "No se pudo mostrar el mapa de la sede",
+    "errorHint": "El mapa interactivo no cargó. Revise la clave de Google Maps o use WhatsApp para indicaciones.",
+    "iframeTitle": "Mapa de {name} en {address}",
+    "aria": "Ubicación de {name} en {address}",
+    "loading": "Cargando mapa de la sede…"
+  },
+  "footer": {
+    "blurb": "{legal} — {acronym}. Socio tecnológico en Villavicencio, Meta: reparación, software administrativo y productos para empresas y pymes.",
+    "closer": "Tecnología que impulsa su negocio.",
+    "contact": "Contacto",
+    "resources": "Recursos",
+    "pdf": "Presentación PDF",
+    "coverage": "Cobertura",
+    "top": "Volver al inicio",
+    "rights": "© {year} {legal}. Todos los derechos reservados.",
+    "cookiesNote": "Sitio informativo. No utilizamos cookies de publicidad."
+  },
+  "brochureGate": {
+    "title": "Presentación solo en español",
+    "body": "La presentación comercial de ROSE S.A.S. está disponible únicamente en español. Puede cancelar o descargarla de todos modos.",
+    "cancel": "Cancelar",
+    "confirm": "Descargar de todos modos"
+  },
+  "cookie": {
+    "text": "Este sitio no instala cookies de seguimiento. Solo guardamos en su navegador si cierra este aviso.",
+    "ok": "Entendido"
+  }
+}

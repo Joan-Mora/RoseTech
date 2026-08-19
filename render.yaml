@@ -1,0 +1,28 @@
+# Blueprint: connect this repo in Render and fill secret values in the dashboard.
+# Do not put real keys in this file.
+services:
+  - type: web
+    name: rose-tech
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: API_HOST
+        value: "0.0.0.0"
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
+        sync: false
+      - key: CEO_EMAIL
+        sync: false
+      - key: VITE_GOOGLE_MAPS_KEY
+        sync: false
+      - key: VITE_GOOGLE_MAPS_MAP_ID
+        sync: false
+      - key: FRONTEND_ORIGIN
+        sync: false
