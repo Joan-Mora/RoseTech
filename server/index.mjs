@@ -190,7 +190,12 @@ const apiHelmet = helmet({
 });
 
 const siteHelmet = helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    useDefaults: false,
+    directives: {
+      frameAncestors: ["'self'"],
+    },
+  },
   crossOriginResourcePolicy: { policy: "same-origin" },
   referrerPolicy: { policy: "strict-origin-when-cross-origin" },
 });

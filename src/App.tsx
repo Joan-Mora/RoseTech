@@ -61,10 +61,11 @@ export default function App() {
       <main>
         <section id="inicio" className="hero">
           <div className="wrap hero-grid">
-            <div>
+            <div className="hero-copy">
               <p className="tag">{m.hero.tagline}</p>
               <h1>
-                <span>ROSE</span>TECHNOLOGY
+                <span className="hero-rose">ROSE</span>
+                <span className="hero-tech">TECHNOLOGY</span>
               </h1>
               <p className="lede">{m.hero.lede}</p>
               <div className="hero-actions">
