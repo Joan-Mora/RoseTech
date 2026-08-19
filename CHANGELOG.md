@@ -9,13 +9,12 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ### Added
 
-- Local architecture PDF (`docs/ROSE-arquitectura.pdf` via `npm run docs`) and repository [ARCHITECTURE.md](./ARCHITECTURE.md).
+- Repository [ARCHITECTURE.md](./ARCHITECTURE.md).
 - Visual bilingual READMEs (shields, language switcher, no emoji) and this changelog.
 
 ### Changed
 
 - Mobile navigation lock is scoped to the hamburger breakpoint so desktop layout is not stuck after resize.
-- Docs generator also emits the architecture PDF with the same ROSE chrome (logo, watermark, pagination).
 
 ## [1.0.0] — 2026-08-19
 
@@ -24,14 +23,13 @@ First production-shaped delivery of the institutional site for **ROSE S.A.S.** (
 ### Added
 
 - Brochure-style single-page site derived from the commercial PDF: hero, about, services, Myshop, products, team, coverage, contact, footer, cookie notice, and JSON-LD `LocalBusiness`.
-- Brand kit in `public/brand/` (hero block, header marks, WhatsApp icon) used by the UI, mail, and local PDFs. Palette black / white / `#e10600`.
+- Brand kit in `public/brand/` (hero block, header marks, WhatsApp icon) used by the UI and mail. Palette black / white / `#e10600`.
 - Contact pipeline: closed business topics, client + server validation, honeypot, Resend lead to `CEO_EMAIL` and visitor confirmation (HTML escaped; logo CID).
 - Google Maps for HQ (`LocationMap`) with iframe fallback, and Meta coverage map (`CoverageMap`) from OSM-derived GeoJSON (`scripts/fetch-coverage.mjs` → `src/data/coverage.json`): urban cores for on-site service and the department polygon for remote support.
 - Internationalization: nine locales (Spanish default, plus English, French, Simplified Chinese, Brazilian Portuguese, German, Japanese, Italian, Korean) with `localStorage` persistence.
 - Light / dark theme (`ThemeProvider`), first-visit `prefers-color-scheme`, `rose-theme` persistence, theme-aware maps and logos, anti-flash script in `index.html`.
 - Security controls: Helmet, CORS allowlist, JSON body cap, rejected unknown fields, rate limit on `POST /api/contact`, production logs without PII, CSP/referrer on Vite and `index.html`, [SECURITY.md](./SECURITY.md).
 - Production packaging: multi-stage Docker image, Compose, Render blueprint (`render.yaml`) on the **free** plan, one Node process serving `dist/` + `/api`, `GET /api/health`.
-- Local corporate PDFs (`npm run docs`): technical documentation and executive report under gitignored `docs/`.
 - Bilingual README and `.env.example` (variable **names** only).
 
 ### Changed
@@ -39,7 +37,6 @@ First production-shaped delivery of the institutional site for **ROSE S.A.S.** (
 - Form topics use stable ids (labels translate); server accepts id or legacy local label.
 - Mail and Maps stay on opposite sides of the trust boundary: Resend never uses `VITE_*`; Maps keys are public and must be referrer-restricted.
 - Brand assets consolidated in `public/brand/` (Vite copies them to `dist/brand/`).
-- Local docs PDFs stopped being tracked in Git.
 
 ### Fixed
 

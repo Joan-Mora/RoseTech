@@ -74,14 +74,6 @@ npm run preview
 
 `npm run preview` serves the frontend and still proxies `/api` to a separately running API. Production uses `npm start` (or Docker) so **one process** serves `dist/` and the API.
 
-Regenerate project PDFs locally (gitignored; they are **not** in the GitHub repo):
-
-```bash
-npm run docs
-```
-
-Outputs under `docs/`: technical manual, executive report, and architecture PDF.
-
 ---
 
 ## <img src="https://cdn.simpleicons.org/dotenv/ECD53F" width="20" height="20" alt=""> Environment variables
@@ -152,7 +144,6 @@ See [SECURITY.md](./SECURITY.md) before going live.
 | `npm run build` | TypeScript check and `dist/` |
 | `npm run preview` | Serves `dist/` with proxy to the API |
 | `npm start` | Production: static `dist/` + `/api` |
-| `npm run docs` | Generates PDFs locally in `docs/` (not committed) |
 
 Exact dependency versions are in `package-lock.json`.
 
@@ -168,8 +159,7 @@ src/                   React app
 src/i18n/              Translations and locale provider
 src/theme/             Light / dark theme
 src/data/coverage.json Coverage polygons (OSM)
-scripts/               Coverage fetch, PDF generator
-docs/                  Local PDFs from `npm run docs` (gitignored)
+scripts/               Coverage fetch
 Dockerfile             Multi-stage production image
 render.yaml            Render blueprint
 ARCHITECTURE.md        System architecture (GitHub)

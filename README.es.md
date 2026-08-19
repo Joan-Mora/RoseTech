@@ -74,14 +74,6 @@ npm run preview
 
 `npm run preview` sirve el frontend y sigue haciendo proxy de `/api` hacia una API aparte. En producción use `npm start` (o Docker) para que **un solo proceso** sirva `dist/` y la API.
 
-Documentos PDF de proyecto (se generan en local con `npm run docs`; **no** van a GitHub):
-
-```bash
-npm run docs
-```
-
-En `docs/`: manual técnico, reporte ejecutivo y PDF de arquitectura.
-
 ---
 
 ## <img src="https://cdn.simpleicons.org/dotenv/ECD53F" width="20" height="20" alt=""> Variables de entorno
@@ -152,7 +144,6 @@ Revise [SECURITY.md](./SECURITY.md) antes de publicar.
 | `npm run build` | Comprueba TypeScript y genera `dist/` |
 | `npm run preview` | Sirve `dist/` con proxy a la API |
 | `npm start` | Producción: estáticos `dist/` + `/api` |
-| `npm run docs` | Genera los PDF en `docs/` (solo local; no se versionan) |
 
 Las versiones exactas de dependencias quedan en `package-lock.json`.
 
@@ -168,8 +159,7 @@ src/                   Aplicación React
 src/i18n/              Traducciones y proveedor de idioma
 src/theme/             Tema claro / oscuro
 src/data/coverage.json Polígonos de cobertura (OSM)
-scripts/               Cobertura y generador de PDF
-docs/                  PDF locales de `npm run docs` (fuera de Git)
+scripts/               Cobertura OSM
 Dockerfile             Imagen de producción multi-etapa
 render.yaml            Blueprint de Render
 ARCHITECTURE.md        Arquitectura del sistema (GitHub)

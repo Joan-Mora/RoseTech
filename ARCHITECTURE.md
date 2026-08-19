@@ -2,7 +2,7 @@
 
 Sitio institucional de **ROSE S.A.S.** (marca comercial **ROSE Technology**). Este documento describe la arquitectura elegida, el motivo de cada pieza y cómo se reparte el sistema en local y en producción.
 
-El mismo contenido, con la marca ROSE, se genera en local con `npm run docs` como `docs/ROSE-arquitectura.pdf` (fuera de Git). **No hay secretos en este archivo.**
+**No hay secretos en este archivo.**
 
 Related: [README.md](./README.md) · [README.es.md](./README.es.md) · [SECURITY.md](./SECURITY.md) · [CHANGELOG.md](./CHANGELOG.md)
 
@@ -69,7 +69,7 @@ Los leads no se guardan en Postgres ni en un CRM propio: llegan a `CEO_EMAIL` y 
 
 ### Docker y Render (plan free)
 
-La imagen de dos etapas deja compiladores y `pdfkit` fuera del runtime. Render construye esa imagen, inyecta secretos del panel (`sync: false` en el blueprint) y comprueba `GET /api/health`. El plan gratuito puede dormir el proceso por inactividad: aceptable para un folleto, no para una API crítica 24/7.
+La imagen de dos etapas deja compiladores y dependencias de desarrollo fuera del runtime. Render construye esa imagen, inyecta secretos del panel (`sync: false` en el blueprint) y comprueba `GET /api/health`. El plan gratuito puede dormir el proceso por inactividad: aceptable para un folleto, no para una API crítica 24/7.
 
 ---
 
@@ -124,8 +124,7 @@ src/lib/                Carga del script de Google Maps
 server/                 Express + plantillas de correo
 public/                 Favicon, folleto, robots, fotos de servicios
 public/brand/           Kit de marca (Vite lo copia a dist/brand/)
-scripts/                Cobertura OSM + generador local de PDF
-docs/                   PDF generados — solo local, gitignore
+scripts/                Cobertura OSM
 Dockerfile              Imagen de producción multi-etapa
 docker-compose.yml      Arranque local tipo producción
 render.yaml             Blueprint de Render (plan free)
@@ -194,6 +193,5 @@ No hay cola, webhook ni tabla de leads. Modelo de amenazas y reporte: [SECURITY.
 - No es un CMS: los textos viven en JSON de i18n y en componentes.
 - No es un backend de negocio: no hay autenticación, sesiones ni roles.
 - No es un almacén de datos: el correo es el sistema de registro de leads.
-- Los PDF de `docs/` son una herramienta **local** (`npm run docs`), no parte del árbol en GitHub.
 
 Un panel de leads o un blog exigiría un diseño de persistencia nuevo, no una base improvisada dentro de este proceso.
