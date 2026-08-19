@@ -28,6 +28,9 @@ extracted/
 pdf-text.txt
 coverage/
 
+# Local-only PDFs from `npm run docs`. Not published to GitHub.
+docs/
+
 .turbo/
 .cache/
 *.tsbuildinfo

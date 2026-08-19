@@ -24,7 +24,6 @@ const FOOTER_H = 14 * MM;
 
 const logoBlanco = path.join(BRAND, "logo-mark.png");
 const logoRojo = path.join(BRAND, "logo-hero.png");
-const logoNegro = path.join(BRAND, "logo-hero-mark-red.png");
 const mark = fs.existsSync(logoRojo) ? logoRojo : logoBlanco;
 
 fs.mkdirSync(DOCS, { recursive: true });
@@ -52,18 +51,42 @@ function openDoc(filename) {
 }
 
 function drawWatermark(doc) {
-  if (!fs.existsSync(mark)) return;
+  const src = fs.existsSync(logoBlanco) ? logoBlanco : mark;
+  if (!fs.existsSync(src)) return;
   doc.save();
-  const w = 210;
-  const x = (doc.page.width - w) / 2;
-  const y = (doc.page.height - w) / 2;
-  doc.opacity(0.055);
+  const size = Math.min(168, doc.page.width * 0.38, doc.page.height * 0.28);
+  const x = (doc.page.width - size) / 2;
+  const y = (doc.page.height - size) / 2;
+  doc.opacity(0.05);
   try {
-    doc.image(mark, x, y, { width: w, align: "center" });
+    doc.image(src, x, y, { fit: [size, size], align: "center", valign: "center" });
   } catch {
     /* PNG no soportado en este entorno */
   }
   doc.restore();
+}
+
+/** Chrome/watermark sit in the margin band; disable auto page-breaks so they cannot spawn empty pages. */
+function withoutPageBreaks(doc, fn) {
+  const page = doc.page;
+  const saved = {
+    top: page.margins.top,
+    bottom: page.margins.bottom,
+    left: page.margins.left,
+    right: page.margins.right,
+  };
+  page.margins.top = 0;
+  page.margins.bottom = 0;
+  page.margins.left = 0;
+  page.margins.right = 0;
+  try {
+    fn();
+  } finally {
+    page.margins.top = saved.top;
+    page.margins.bottom = saved.bottom;
+    page.margins.left = saved.left;
+    page.margins.right = saved.right;
+  }
 }
 
 function drawChrome(doc, subtitle, page, total) {
@@ -112,10 +135,13 @@ function drawChrome(doc, subtitle, page, total) {
 
 function finish(doc, subtitle) {
   const range = doc.bufferedPageRange();
-  for (let i = 0; i < range.count; i++) {
+  const total = range.count;
+  for (let i = 0; i < total; i++) {
     doc.switchToPage(range.start + i);
-    drawWatermark(doc);
-    drawChrome(doc, subtitle, i + 1, range.count);
+    withoutPageBreaks(doc, () => {
+      drawWatermark(doc);
+      drawChrome(doc, subtitle, i + 1, total);
+    });
   }
   doc.end();
 }
@@ -190,15 +216,18 @@ function kvTable(doc, rows) {
 }
 
 function cover(doc, { kicker, title, subtitle, date }) {
-  doc.moveDown(2.2);
+  const left = doc.page.margins.left;
+  doc.moveDown(1.6);
   if (fs.existsSync(logoRojo)) {
     try {
-      doc.image(logoRojo, { width: 96 });
+      const y = doc.y;
+      doc.image(logoRojo, left, y, { fit: [110, 52], align: "left", valign: "center" });
+      doc.y = y + 58;
     } catch {
       /* ignore */
     }
   }
-  doc.moveDown(1.1);
+  doc.moveDown(0.85);
   doc.fillColor(RED).font("Helvetica-Bold").fontSize(9).text(kicker.toUpperCase(), { characterSpacing: 1.4 });
   doc.moveDown(0.35);
   doc.fillColor(INK).font("Helvetica-Bold").fontSize(22).text(title, { lineGap: 4 });
@@ -208,14 +237,6 @@ function cover(doc, { kicker, title, subtitle, date }) {
   doc.fillColor(MUTED).font("Helvetica").fontSize(9).text(date);
   doc.moveDown(0.2);
   doc.fillColor(GRAY).font("Helvetica").fontSize(9).text("Villavicencio, Meta, Colombia");
-  if (fs.existsSync(logoNegro)) {
-    doc.moveDown(1.4);
-    try {
-      doc.image(logoNegro, { width: 72 });
-    } catch {
-      /* ignore */
-    }
-  }
 }
 
 function waitEnd(stream) {
@@ -414,7 +435,7 @@ function technicalPdf() {
     ["src/", "Aplicación React (componentes, i18n, tema)."],
     ["src/data/", "GeoJSON de cobertura."],
     ["scripts/", "Cobertura OSM, generador de PDF."],
-    ["docs/", "PDF técnicos y ejecutivos del proyecto."],
+    ["docs/", "PDF locales (npm run docs). No se publican en GitHub."],
   ]);
   para(
     doc,
@@ -428,7 +449,7 @@ function technicalPdf() {
   );
   para(
     doc,
-    "Los PDF de docs/ se generan con este script (pdfkit) para mantener márgenes de 24 mm, cabecera negra con filete rojo, pie confidencial con numeración y marca de agua del isotipo. Pueden versionarse: no contienen secretos.",
+    "Los PDF de docs/ se generan en local con este script (pdfkit): márgenes de 24 mm, cabecera negra con filete rojo, pie confidencial con numeración y marca de agua del isotipo. No se publican en GitHub.",
   );
 
   finish(doc, "Documentación técnica");
@@ -512,9 +533,16 @@ function executivePdf() {
   return { stream, out };
 }
 
+function countPdfPages(file) {
+  const text = fs.readFileSync(file).toString("latin1");
+  const counts = [...text.matchAll(/\/Type\s*\/Pages\b[\s\S]{0,200}?\/Count\s+(\d+)/g)];
+  if (counts.length) return Number(counts[counts.length - 1][1]);
+  return (text.match(/\/Type\s*\/Page\b/g) || []).length;
+}
+
 const a = technicalPdf();
 const b = executivePdf();
 await Promise.all([waitEnd(a.stream), waitEnd(b.stream)]);
 console.log("PDF generados:");
-console.log(" ", path.relative(ROOT, a.out));
-console.log(" ", path.relative(ROOT, b.out));
+console.log(" ", path.relative(ROOT, a.out), `(${countPdfPages(a.out)} pages)`);
+console.log(" ", path.relative(ROOT, b.out), `(${countPdfPages(b.out)} pages)`);

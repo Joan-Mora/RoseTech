@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { LOCALES, LOCALE_META } from "../i18n/locales";
 import { useI18n } from "../i18n/I18nProvider";
 import { useTheme } from "../theme/ThemeProvider";
+import FlagIcon from "./FlagIcon";
 
 export function ThemeToggle({ className = "" }: { className?: string }) {
   const { theme, toggleTheme } = useTheme();
@@ -34,12 +35,56 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   );
 }
 
+function LocaleOptions({
+  listId,
+  locale,
+  setLocale,
+  label,
+  onPick,
+  inflow,
+}: {
+  listId: string;
+  locale: (typeof LOCALES)[number];
+  setLocale: (code: (typeof LOCALES)[number]) => void;
+  label: string;
+  onPick?: () => void;
+  inflow?: boolean;
+}) {
+  return (
+    <ul
+      id={listId}
+      className={`lang-menu${inflow ? " lang-menu-inflow" : ""}`}
+      role="listbox"
+      aria-label={label}
+    >
+      {LOCALES.map((code) => (
+        <li key={code}>
+          <button
+            type="button"
+            role="option"
+            aria-selected={code === locale}
+            className={code === locale ? "is-on" : undefined}
+            onClick={() => {
+              setLocale(code);
+              onPick?.();
+            }}
+          >
+            <FlagIcon locale={code} />
+            <span>{LOCALE_META[code].native}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function LanguageSwitcher({ variant = "compact" }: { variant?: "compact" | "stack" }) {
   const { locale, setLocale, m } = useI18n();
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const listId = useId();
   const current = LOCALE_META[locale];
+  const stacked = variant === "stack";
 
   useEffect(() => {
     if (!open) return;
@@ -52,42 +97,33 @@ export function LanguageSwitcher({ variant = "compact" }: { variant?: "compact" 
 
   return (
     <div className={`lang-switch ${variant}`} ref={root}>
+      {stacked ? <p className="lang-stack-label">{m.a11y.language}</p> : null}
       <button
         type="button"
-        className="icon-btn lang-trigger"
+        className={`icon-btn lang-trigger${stacked ? " lang-trigger-block" : ""}`}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
-        aria-label={m.a11y.language}
+        aria-label={stacked ? `${m.a11y.language}: ${current.native}` : m.a11y.language}
         onClick={() => setOpen((v) => !v)}
       >
-        <span className="flag" aria-hidden="true">
-          {current.flag}
-        </span>
-        {variant === "stack" ? <span>{current.native}</span> : null}
+        <FlagIcon locale={locale} />
+        {stacked ? <span className="lang-name">{current.native}</span> : null}
+        {stacked ? (
+          <svg className="lang-caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <path fill="currentColor" d="M7.4 9.2a1 1 0 0 1 1.4 0L12 12.4l3.2-3.2a1 1 0 1 1 1.4 1.4l-3.9 3.9a1 1 0 0 1-1.4 0L7.4 10.6a1 1 0 0 1 0-1.4Z" />
+          </svg>
+        ) : null}
       </button>
       {open ? (
-        <ul id={listId} className="lang-menu" role="listbox" aria-label={m.a11y.language}>
-          {LOCALES.map((code) => (
-            <li key={code}>
-              <button
-                type="button"
-                role="option"
-                aria-selected={code === locale}
-                className={code === locale ? "is-on" : undefined}
-                onClick={() => {
-                  setLocale(code);
-                  setOpen(false);
-                }}
-              >
-                <span className="flag" aria-hidden="true">
-                  {LOCALE_META[code].flag}
-                </span>
-                <span>{LOCALE_META[code].native}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+        <LocaleOptions
+          listId={listId}
+          locale={locale}
+          setLocale={setLocale}
+          label={m.a11y.language}
+          onPick={() => setOpen(false)}
+          inflow={stacked}
+        />
       ) : null}
     </div>
   );

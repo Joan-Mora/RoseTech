@@ -45,7 +45,7 @@ npm run preview
 
 `npm run preview` serves the frontend and still proxies `/api` to a separately running API. Production uses `npm start` (or Docker) so **one process** serves `dist/` and the API.
 
-Regenerate project PDFs:
+Regenerate project PDFs locally (gitignored; they are **not** in the GitHub repo):
 
 ```bash
 npm run docs
@@ -113,7 +113,7 @@ See [SECURITY.md](./SECURITY.md) before going live.
 | `npm run build` | TypeScript check and `dist/` |
 | `npm run preview` | Serves `dist/` with proxy to the API |
 | `npm start` | Production: static `dist/` + `/api` |
-| `npm run docs` | Generates PDFs in `docs/` |
+| `npm run docs` | Generates PDFs locally in `docs/` (not committed) |
 
 Exact dependency versions are in `package-lock.json`.
 
@@ -128,7 +128,7 @@ src/i18n/              Translations and locale provider
 src/theme/             Light / dark theme
 src/data/coverage.json Coverage polygons (OSM)
 scripts/               Coverage fetch, PDF generator
-docs/                  Project PDFs
+docs/                  Local PDFs from `npm run docs` (gitignored)
 Dockerfile             Multi-stage production image
 render.yaml            Render blueprint
 ```

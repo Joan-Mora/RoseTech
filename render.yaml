@@ -4,6 +4,7 @@ services:
   - type: web
     name: rose-tech
     runtime: docker
+    plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /api/health

@@ -48,28 +48,58 @@ export default function Header() {
   }, [items]);
 
   useEffect(() => {
-    document.body.classList.toggle("nav-lock", open);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
     window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    if (!open) {
+      html.classList.remove("nav-lock");
+      body.classList.remove("nav-lock");
+      return;
+    }
+
+    const scrollY = window.scrollY;
+    html.classList.add("nav-lock");
+    body.classList.add("nav-lock");
+    body.style.top = `-${scrollY}px`;
+
+    const onTouchMove = (e: TouchEvent) => {
+      const drawer = document.getElementById("mobile-nav");
+      if (drawer?.contains(e.target as Node)) return;
+      e.preventDefault();
+    };
+    document.addEventListener("touchmove", onTouchMove, { passive: false });
+
     return () => {
-      document.body.classList.remove("nav-lock");
-      window.removeEventListener("keydown", onKey);
+      html.classList.remove("nav-lock");
+      body.classList.remove("nav-lock");
+      body.style.top = "";
+      document.removeEventListener("touchmove", onTouchMove);
+      window.scrollTo(0, scrollY);
     };
   }, [open]);
+
+  const BrandLink = () => (
+    <a className="brand" href="#inicio" onClick={() => setOpen(false)}>
+      <img src={mark} alt={m.hero.logoAlt} width={48} height={58} />
+      <span>
+        <strong>ROSE S.A.S.</strong>
+        <small>{COMPANY.city}</small>
+      </span>
+    </a>
+  );
 
   return (
     <>
       <header className={`nav${open ? " open" : ""}`}>
         <div className="nav-inner">
-          <a className="brand" href="#inicio" onClick={() => setOpen(false)}>
-            <img src={mark} alt={m.hero.logoAlt} width={48} height={58} />
-            <span>
-              <strong>ROSE S.A.S.</strong>
-              <small>{COMPANY.city}</small>
-            </span>
-          </a>
+          <BrandLink />
 
           <nav className="nav-desktop" aria-label={m.a11y.mainNav}>
             <ul className="nav-links">
@@ -110,33 +140,45 @@ export default function Header() {
         </div>
       </header>
 
-      <div className="nav-drawer" id="mobile-nav" hidden={!open}>
-        <nav aria-label={m.a11y.mobileNav}>
-          <ul className="drawer-links">
-            {items.map((item) => (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  className={active === item.href ? "active" : undefined}
-                  onClick={() => setOpen(false)}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="drawer-tools">
-          <LanguageSwitcher variant="stack" />
-          <ThemeToggle />
+      <div className="nav-drawer" id="mobile-nav" hidden={!open} role="dialog" aria-modal={open || undefined}>
+        <div className="nav-drawer-head">
+          <BrandLink />
+          <button className="menu-btn drawer-close" type="button" aria-label={m.a11y.closeMenu} onClick={() => setOpen(false)}>
+            <span className="menu-lines" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+          </button>
         </div>
-        <div className="drawer-actions">
-          <a className="btn btn-primary" href="#contacto" onClick={() => setOpen(false)}>
-            {m.nav.contactCta}
-          </a>
-          <BrochureDownload className="btn btn-ghost" onNavigate={() => setOpen(false)}>
-            {m.nav.brochureLong}
-          </BrochureDownload>
+        <div className="nav-drawer-body">
+          <nav aria-label={m.a11y.mobileNav}>
+            <ul className="drawer-links">
+              {items.map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    className={active === item.href ? "active" : undefined}
+                    onClick={() => setOpen(false)}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="drawer-tools">
+            <ThemeToggle />
+            <LanguageSwitcher variant="stack" />
+          </div>
+          <div className="drawer-actions">
+            <a className="btn btn-primary" href="#contacto" onClick={() => setOpen(false)}>
+              {m.nav.contactCta}
+            </a>
+            <BrochureDownload className="btn btn-ghost" onNavigate={() => setOpen(false)}>
+              {m.nav.brochureLong}
+            </BrochureDownload>
+          </div>
         </div>
       </div>
     </>
