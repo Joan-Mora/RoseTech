@@ -17,6 +17,65 @@ const NAV_HREFS = [
   ["contact", "#contacto"],
 ] as const;
 
+/** Matches CSS hamburger breakpoint: `@media (max-width: 1279px)`. */
+const DESKTOP_NAV_MQ = "(min-width: 1280px)";
+
+let touchMoveGuard: ((e: TouchEvent) => void) | null = null;
+
+function unlockBody() {
+  const html = document.documentElement;
+  const body = document.body;
+  const lockedTop = body.style.top;
+
+  html.classList.remove("nav-lock");
+  body.classList.remove("nav-lock");
+  html.style.removeProperty("overflow");
+  body.style.removeProperty("overflow");
+  body.style.removeProperty("position");
+  body.style.removeProperty("top");
+  body.style.removeProperty("left");
+  body.style.removeProperty("right");
+  body.style.removeProperty("width");
+  body.style.removeProperty("padding-right");
+  html.style.removeProperty("padding-right");
+
+  if (touchMoveGuard) {
+    document.removeEventListener("touchmove", touchMoveGuard);
+    touchMoveGuard = null;
+  }
+
+  if (lockedTop) {
+    const y = Math.abs(Number.parseInt(lockedTop, 10) || 0);
+    window.scrollTo(0, y);
+  }
+}
+
+function lockBody() {
+  const html = document.documentElement;
+  const body = document.body;
+  const scrollY = window.scrollY;
+
+  if (touchMoveGuard) {
+    document.removeEventListener("touchmove", touchMoveGuard);
+    touchMoveGuard = null;
+  }
+
+  html.classList.add("nav-lock");
+  body.classList.add("nav-lock");
+  body.style.top = `-${scrollY}px`;
+
+  touchMoveGuard = (e: TouchEvent) => {
+    const drawer = document.getElementById("mobile-nav");
+    if (drawer?.contains(e.target as Node)) return;
+    e.preventDefault();
+  };
+  document.addEventListener("touchmove", touchMoveGuard, { passive: false });
+}
+
+function isDesktopNav() {
+  return window.matchMedia(DESKTOP_NAV_MQ).matches;
+}
+
 export default function Header() {
   const { m } = useI18n();
   const { theme } = useTheme();
@@ -56,33 +115,30 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    if (!open) {
-      html.classList.remove("nav-lock");
-      body.classList.remove("nav-lock");
+    const closeIfDesktop = () => {
+      if (!isDesktopNav()) return;
+      setOpen(false);
+      unlockBody();
+    };
+
+    closeIfDesktop();
+    const mq = window.matchMedia(DESKTOP_NAV_MQ);
+    mq.addEventListener("change", closeIfDesktop);
+    window.addEventListener("resize", closeIfDesktop);
+    return () => {
+      mq.removeEventListener("change", closeIfDesktop);
+      window.removeEventListener("resize", closeIfDesktop);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!open || isDesktopNav()) {
+      unlockBody();
       return;
     }
 
-    const scrollY = window.scrollY;
-    html.classList.add("nav-lock");
-    body.classList.add("nav-lock");
-    body.style.top = `-${scrollY}px`;
-
-    const onTouchMove = (e: TouchEvent) => {
-      const drawer = document.getElementById("mobile-nav");
-      if (drawer?.contains(e.target as Node)) return;
-      e.preventDefault();
-    };
-    document.addEventListener("touchmove", onTouchMove, { passive: false });
-
-    return () => {
-      html.classList.remove("nav-lock");
-      body.classList.remove("nav-lock");
-      body.style.top = "";
-      document.removeEventListener("touchmove", onTouchMove);
-      window.scrollTo(0, scrollY);
-    };
+    lockBody();
+    return () => unlockBody();
   }, [open]);
 
   const BrandLink = () => (

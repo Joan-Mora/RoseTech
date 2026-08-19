@@ -582,23 +582,6 @@ header.nav {
   display: none;
 }
 
-html.nav-lock,
-html.nav-lock body {
-  overflow: hidden;
-  overscroll-behavior: none;
-}
-
-body.nav-lock {
-  position: fixed;
-  left: 0;
-  right: 0;
-  width: 100%;
-}
-
-body.nav-lock .cookie {
-  display: none;
-}
-
 .hero {
   position: relative;
   overflow-x: clip;
@@ -1321,6 +1304,20 @@ footer a {
     z-index: 80;
   }
   .nav-drawer[hidden] {
+    display: none;
+  }
+  html.nav-lock,
+  html.nav-lock body {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  body.nav-lock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+  body.nav-lock .cookie {
     display: none;
   }
   .nav-drawer-head {

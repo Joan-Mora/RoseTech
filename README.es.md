@@ -1,4 +1,21 @@
-[English](README.md) | [Español](README.es.md)
+<p align="center">
+  <img src="public/brand/logo-hero.png" alt="ROSE Technology" height="72">
+</p>
+
+<p align="center">
+  <a href="README.md"><img src="https://img.shields.io/badge/EN-English-111111?style=for-the-badge" alt="English"></a>
+  <a href="README.es.md"><img src="https://img.shields.io/badge/ES-Español-e10600?style=for-the-badge" alt="Español"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js 20">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render">
+  <img src="https://img.shields.io/badge/Licencia-Privada-e10600?style=for-the-badge" alt="Licencia privada">
+</p>
 
 # ROSE Technology — Sitio corporativo
 
@@ -6,7 +23,15 @@ Sitio web institucional de **ROSE S.A.S.** (marca comercial **ROSE Technology**)
 
 Presenta la oferta de servicio técnico, el software administrativo **Myshop**, productos tecnológicos, cobertura territorial y un canal de contacto que notifica al equipo por correo.
 
-## Stack
+<p>
+  <a href="ARCHITECTURE.md"><img src="https://img.shields.io/badge/Arquitectura-070707?style=flat-square" alt="Arquitectura"></a>
+  <a href="SECURITY.md"><img src="https://img.shields.io/badge/Seguridad-e10600?style=flat-square" alt="Seguridad"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-5c524f?style=flat-square" alt="Changelog"></a>
+</p>
+
+---
+
+## <img src="https://cdn.simpleicons.org/react/61DAFB" width="20" height="20" alt=""> Stack
 
 | Capa | Tecnología |
 | --- | --- |
@@ -17,7 +42,11 @@ Presenta la oferta de servicio técnico, el software administrativo **Myshop**, 
 | Mapas | Google Maps JavaScript API / iframe Embed si no hay clave |
 | Producción | Un proceso Node: estáticos `dist/` + `POST /api/contact` |
 
-## Cómo ejecutarlo (local)
+Decisiones de diseño, mapa de carpetas y flujo de datos: **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
+
+---
+
+## <img src="https://cdn.simpleicons.org/nodedotjs/339933" width="20" height="20" alt=""> Cómo ejecutarlo (local)
 
 Requisitos: Node.js 20 o superior.
 
@@ -51,7 +80,11 @@ Documentos PDF de proyecto (se generan en local con `npm run docs`; **no** van a
 npm run docs
 ```
 
-## Variables de entorno
+En `docs/`: manual técnico, reporte ejecutivo y PDF de arquitectura.
+
+---
+
+## <img src="https://cdn.simpleicons.org/dotenv/ECD53F" width="20" height="20" alt=""> Variables de entorno
 
 Definidas en `.env.example`. **No** copie claves reales a README, issues, PDFs ni `render.yaml`.
 
@@ -80,7 +113,9 @@ Definidas en `.env.example`. **No** copie claves reales a README, issues, PDFs n
 
 Sin `VITE_GOOGLE_MAPS_KEY` el sitio usa un iframe de Google Maps.
 
-## Docker
+---
+
+## <img src="https://cdn.simpleicons.org/docker/2496ED" width="20" height="20" alt=""> Docker
 
 No meta `.env` en la imagen. Pase secretos en runtime con `env_file` o el entorno del host. La clave de Maps es un **arg de build** porque Vite la incrusta.
 
@@ -97,13 +132,17 @@ docker build --build-arg VITE_GOOGLE_MAPS_KEY --build-arg VITE_GOOGLE_MAPS_MAP_I
 docker run --env-file .env -e NODE_ENV=production -e PORT=8787 -e API_HOST=0.0.0.0 -p 8787:8787 rose-tech
 ```
 
-## Render
+---
+
+## <img src="https://cdn.simpleicons.org/render/46E3B7" width="20" height="20" alt=""> Render
 
 Blueprint: [`render.yaml`](./render.yaml). Conecte el repositorio de GitHub, aplique el blueprint y pegue los valores secretos en el panel (`sync: false`: no van a Git). Tras el primer despliegue, defina `FRONTEND_ORIGIN` como `https://<servicio>.onrender.com` (sin barra final) y vuelva a desplegar para CORS. Si cambia `VITE_GOOGLE_MAPS_KEY`, reconstruya la imagen Docker para que Vite la incruste.
 
 Revise [SECURITY.md](./SECURITY.md) antes de publicar.
 
-## Scripts
+---
+
+## <img src="https://cdn.simpleicons.org/gnubash/4EAA25" width="20" height="20" alt=""> Scripts
 
 | Script | Qué hace |
 | --- | --- |
@@ -117,7 +156,9 @@ Revise [SECURITY.md](./SECURITY.md) antes de publicar.
 
 Las versiones exactas de dependencias quedan en `package-lock.json`.
 
-## Estructura
+---
+
+## <img src="https://cdn.simpleicons.org/git/e10600" width="20" height="20" alt=""> Estructura
 
 ```
 public/brand/          Activos de marca que sirven el sitio y el correo
@@ -131,7 +172,10 @@ scripts/               Cobertura y generador de PDF
 docs/                  PDF locales de `npm run docs` (fuera de Git)
 Dockerfile             Imagen de producción multi-etapa
 render.yaml            Blueprint de Render
+ARCHITECTURE.md        Arquitectura del sistema (GitHub)
 ```
+
+---
 
 ## Internacionalización
 
@@ -169,4 +213,4 @@ Los activos en runtime viven solo en `public/brand/` (bloque de héroe, marcas d
 
 ## Licencia
 
-Código y contenidos del sitio: uso interno de ROSE S.A.S. salvo pacto distinto.
+No hay licencia open source publicada. Código y contenidos del sitio: **uso interno de ROSE S.A.S.** salvo pacto distinto.

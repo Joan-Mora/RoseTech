@@ -201,6 +201,11 @@ function ensureSpace(doc, need) {
   if (doc.y + need > limit) doc.addPage();
 }
 
+/** Start the next heading on a new page; skip if already at the top (no blank pages). */
+function pageBreakBefore(doc) {
+  if (doc.y > doc.page.margins.top + 1) doc.addPage();
+}
+
 function kvTable(doc, rows) {
   const left = doc.page.margins.left;
   const usable = doc.page.width - doc.page.margins.left - doc.page.margins.right;
@@ -306,6 +311,7 @@ function technicalPdf() {
     ["Marca", "PNG/SVG en public/brand/ (runtime y PDF)"],
   ]);
 
+  pageBreakBefore(doc);
   h1(doc, "4.  Secciones y funciones del sitio");
   para(doc, "El contenido se organiza en anclas de una sola página, con navegación fija y menú móvil.");
   bullets(doc, [
@@ -419,7 +425,7 @@ function technicalPdf() {
     "npm run build — chequeo TypeScript y dist/.",
     "npm run preview — sirve dist/ con proxy a la API (desarrollo).",
     "npm start — un proceso: estáticos dist/ + /api (producción, NODE_ENV=production).",
-    "npm run docs — regenera este PDF y el reporte ejecutivo.",
+    "npm run docs — regenera este PDF, el reporte ejecutivo y el PDF de arquitectura.",
     "docker compose up --build — imagen de producción con .env en runtime.",
   ]);
   para(
@@ -449,7 +455,7 @@ function technicalPdf() {
   );
   para(
     doc,
-    "Los PDF de docs/ se generan en local con este script (pdfkit): márgenes de 24 mm, cabecera negra con filete rojo, pie confidencial con numeración y marca de agua del isotipo. No se publican en GitHub.",
+    "Los PDF de docs/ se generan en local con este script (pdfkit): márgenes de 24 mm, cabecera negra con filete rojo, pie confidencial con numeración y marca de agua del isotipo. Incluyen este manual, el reporte ejecutivo y ROSE-arquitectura.pdf. No se publican en GitHub.",
   );
 
   finish(doc, "Documentación técnica");
@@ -513,9 +519,10 @@ function executivePdf() {
   bullets(doc, [
     "README.md: arranque, variables, scripts y estructura.",
     "SECURITY.md: modelo de amenazas, reporte de incidentes y lo que es público a propósito.",
-    "Este reporte y la documentación técnica en docs/, regenerables con npm run docs.",
+    "Este reporte, la documentación técnica y el PDF de arquitectura en docs/, regenerables con npm run docs.",
   ]);
 
+  pageBreakBefore(doc);
   h1(doc, "Cómo se opera");
   para(
     doc,
@@ -533,6 +540,295 @@ function executivePdf() {
   return { stream, out };
 }
 
+function drawArchBox(doc, x, y, w, h, title, sub, fill = WHITE) {
+  doc.save();
+  doc.lineWidth(0.8).strokeColor(INK).fillColor(fill);
+  doc.roundedRect(x, y, w, h, 3).fillAndStroke();
+  doc.rect(x, y, 3.2, h).fill(RED);
+  doc.fillColor(INK).font("Helvetica-Bold").fontSize(8).text(title, x + 8, y + 6, {
+    width: w - 12,
+    align: "left",
+  });
+  doc.fillColor(GRAY).font("Helvetica").fontSize(7).text(sub, x + 8, y + 18, {
+    width: w - 12,
+    align: "left",
+    lineGap: 1,
+  });
+  doc.restore();
+}
+
+function drawVLine(doc, x, y1, y2) {
+  doc.save();
+  doc.strokeColor(RED).lineWidth(1.1).moveTo(x, y1).lineTo(x, y2).stroke();
+  doc.restore();
+}
+
+function architecturePdf() {
+  const { doc, stream, out } = openDoc("ROSE-arquitectura.pdf");
+  doc.info.Title = "ROSE Technology — Arquitectura del sistema";
+
+  cover(doc, {
+    kicker: "Arquitectura de sistema",
+    title: "Arquitectura del sitio corporativo",
+    subtitle:
+      "Decisiones de diseño, distribución local y de producción, infraestructura y flujo de datos de ROSE Technology (ROSE S.A.S.).",
+    date: "19 de agosto de 2026",
+  });
+
+  doc.addPage();
+  h1(doc, "1.  Propósito de este documento");
+  para(
+    doc,
+    "Este PDF explica la arquitectura elegida para el sitio institucional de ROSE S.A.S.: qué piezas hay, para qué sirve cada una y por qué se montó así y no como un CMS, un backend con base de datos o varios microservicios. Complementa la documentación técnica (detalle operativo) y el reporte ejecutivo (síntesis de negocio). En GitHub, el mismo contenido vive en ARCHITECTURE.md; este archivo en docs/ es solo local.",
+  );
+  para(
+    doc,
+    "El producto es un folleto digital: comunica marca, servicios, Myshop, productos y cobertura, y convierte una consulta en un correo. No hay cuentas de usuario, pasarela de pago ni persistencia propia de leads.",
+  );
+
+  h1(doc, "2.  Arquitectura elegida");
+  para(
+    doc,
+    "Una aplicación de una sola página (SPA) en Vite, React 19 y TypeScript, más una API Express mínima en el mismo runtime de Node. En desarrollo son dos procesos unidos por un proxy. En producción (Docker / Render) un solo proceso Node sirve los estáticos de dist/ y POST /api/contact.",
+  );
+  bullets(doc, [
+    "Frontend: Vite 7, React 19, TypeScript 5.9, CSS propio (paleta negro / blanco / #e10600).",
+    "API: Express 5 (ESM) en server/index.mjs — contacto, salud y, en producción, archivos estáticos.",
+    "Correo: Resend (SDK en el servidor; la clave nunca llega al navegador).",
+    "Mapas: Google Maps JavaScript API o iframe Embed si falta la clave pública.",
+    "Empaquetado: imagen Docker de dos etapas (build Vite + runner Node 20 Alpine).",
+    "Alojamiento: Render, plan gratuito, runtime Docker según render.yaml.",
+  ]);
+
+  ensureSpace(doc, 196);
+  doc.moveDown(0.2);
+  const left = doc.page.margins.left;
+  const usable = doc.page.width - left - doc.page.margins.right;
+  const col = (usable - 12) / 2;
+  let y = doc.y;
+  drawArchBox(doc, left, y, usable, 36, "Visitante (navegador)", "SPA React, i18n, tema, mapas y formulario", WHITE);
+  drawVLine(doc, left + usable / 2, y + 36, y + 46);
+  y += 46;
+  drawArchBox(
+    doc,
+    left,
+    y,
+    col,
+    44,
+    "Capa de entrega",
+    "Dev: Vite :5173 + proxy /api. Prod: Express sirve dist/ y escucha PORT.",
+    WHITE,
+  );
+  drawArchBox(doc, left + col + 12, y, col, 44, "API Express", "POST /api/contact · GET /api/health · Helmet, CORS, rate limit", WHITE);
+  drawVLine(doc, left + col / 2, y + 44, y + 54);
+  drawVLine(doc, left + col + 12 + col / 2, y + 44, y + 54);
+  y += 54;
+  drawArchBox(doc, left, y, col, 40, "Google Maps", "Clave VITE_* en el bundle. Restringir por HTTP referrer.", WHITE);
+  drawArchBox(doc, left + col + 12, y, col, 40, "Resend", "Lead a CEO_EMAIL y confirmación al visitante. Secreto solo en Node.", WHITE);
+  doc.y = y + 48;
+  doc.moveDown(0.35);
+  note(
+    doc,
+    "En producción el origen del sitio y el de la API coinciden: el formulario llama a /api/contact en el mismo host. CORS extra (FRONTEND_ORIGIN) cubre el caso en que el origen publicado no sea localhost.",
+  );
+
+  h1(doc, "3.  Por qué estas decisiones");
+  h2(doc, "3.1  Un folleto corporativo, no una plataforma");
+  para(
+    doc,
+    "El sitio no gestiona inventario, citas ni usuarios. El valor está en la presencia de marca y en un canal de leads. Un SPA estático más un endpoint de correo cubre ese alcance con poco mantenimiento: sin esquema de base de datos, sin migraciones y sin un segundo servicio que vigilar.",
+  );
+
+  h2(doc, "3.2  Una sola unidad de despliegue");
+  para(
+    doc,
+    "Vite por un lado y Express por otro complican CORS, cookies, salud y facturación en un host gratuito. Un proceso Node que sirve dist/ y /api permite un contenedor, un PORT (el que asigna Render) y una URL. Localmente se mantiene la experiencia de recarga rápida: npm run dev levanta API y Vite en paralelo y el proxy reenvía /api a 127.0.0.1:8787.",
+  );
+
+  h2(doc, "3.3  Resend y Maps imponen el corte cliente / servidor");
+  para(
+    doc,
+    "La clave de Resend es un secreto: si viajara al cliente (por ejemplo con prefijo VITE_), cualquiera podría enviar correo con la cuota de ROSE. Por eso vive solo en el proceso Node. La clave de Google Maps, en cambio, es pública por diseño del producto de Google: Vite la incrusta en el JavaScript. La defensa no es ocultarla, sino restringirla por HTTP referrer y por API (Maps JavaScript y Maps Embed).",
+  );
+
+  h2(doc, "3.4  Sin base de datos adicional");
+  para(
+    doc,
+    "Los leads no se guardan en Postgres ni en un CRM propio: llegan a la bandeja CEO_EMAIL y el visitante recibe confirmación. El idioma y el tema viven en localStorage. Los polígonos de cobertura son JSON versionado (src/data/coverage.json). Añadir una base habría significado backups, contraseñas, plan de pago en Render y superficie de ataque sin beneficio de negocio en esta fase.",
+  );
+
+  h2(doc, "3.5  Docker y Render (plan free)");
+  para(
+    doc,
+    "La imagen de dos etapas deja fuera compiladores y pdfkit del runtime. Render construye esa imagen, inyecta secretos en el panel (sync: false en el blueprint) y comprueba GET /api/health. El plan gratuito encaja con un sitio institucional de tráfico moderado; el proceso se duerme con inactividad, lo aceptable para un folleto, no para un API crítica 24/7.",
+  );
+
+  pageBreakBefore(doc);
+  h1(doc, "4.  Qué hace cada parte");
+  kvTable(doc, [
+    ["Frontend (src/)", "SPA: secciones ancla, navegación fija y menú móvil, formularios y mapas."],
+    ["API /api/contact", "Único flujo de negocio: validar el lead y disparar Resend."],
+    ["API /api/health", "Comprobación de vida para Docker/Render, sin datos personales."],
+    ["Resend", "Correo interno (lead) y confirmación al visitante, HTML escapado."],
+    ["Google Maps", "Sede (LocationMap) y cobertura (CoverageMap + GeoJSON)."],
+    ["i18n", "Nueve locales JSON + I18nProvider; lang del documento y localStorage."],
+    ["Tema", "Claro/oscuro (ThemeProvider), prefers-color-scheme y rose-theme."],
+    ["Marca (public/brand/)", "Logos del sitio, pie, PDF y adjunto CID del correo."],
+  ]);
+  para(
+    doc,
+    "El frontend no habla con Resend ni con Overpass en el navegador. Overpass solo se usa en scripts/fetch-coverage.mjs, en máquina de desarrollo, para regenerar el GeoJSON. El visitante nunca envía su ubicación: los mapas no piden geolocalización.",
+  );
+
+  h2(doc, "4.1  Frontend");
+  para(
+    doc,
+    "React monta una página con anclas (#inicio, servicios, software, productos, equipo, cobertura, contacto). Header gestiona el menú de escritorio y el cajón móvil (bloqueo de scroll). ContactForm valida en el cliente y hace POST JSON. LocationMap carga el script de Maps si hay VITE_GOOGLE_MAPS_KEY; si falla, usa el iframe. CoverageMap pinta polígonos urbanos del Meta y el departamento para servicio remoto.",
+  );
+
+  h2(doc, "4.2  API de contacto");
+  para(
+    doc,
+    "Express aplica Helmet, CORS con allowlist, límite de cuerpo 16 KB y rate limit en POST /api/contact. Rechaza claves JSON no declaradas, valida longitudes, correo, teléfono, tema (allowlist) y locale. Un honeypot (website) hace que los bots reciban 200 sin enviar correo. Si RESEND_API_KEY falta o es un placeholder, responde 503 operativo. En producción, si existe dist/, el mismo proceso sirve el SPA y el fallback de rutas al index.html.",
+  );
+
+  h2(doc, "4.3  Internacionalización y tema");
+  para(
+    doc,
+    "Los textos de interfaz viven en src/i18n/locales/*.json (es predeterminado, más en, fr, zh-CN, pt-BR, de, ja, it, ko). Los temas del formulario usan ids estables; las etiquetas se traducen. El tema visual no es un producto aparte: es estado de UI que también cambia estilos del mapa y el isotipo de cabecera/pie.",
+  );
+
+  h1(doc, "5.  Distribución: local frente a producción");
+  h2(doc, "5.1  Desarrollo local (npm run dev)");
+  bullets(doc, [
+    "concurrently arranca npm run dev:api (node server/index.mjs) y npm run dev:web (vite).",
+    "API en 127.0.0.1:8787 (API_PORT / PORT). API_HOST por defecto 127.0.0.1.",
+    "Vite en :5173. Toda petición a /api se proxyfica a Express. Si la API está caída, el proxy responde 503 en JSON.",
+    "Los estáticos de public/ (marca, imágenes, folleto PDF) los sirve Vite.",
+    "npm run preview sirve dist/ y sigue usando el mismo proxy: la API debe seguir en marcha aparte.",
+  ]);
+
+  h2(doc, "5.2  Producción (npm start, Docker, Render)");
+  bullets(doc, [
+    "npm run build genera dist/ (TypeScript --noEmit + Vite). Las VITE_* se hornean aquí.",
+    "NODE_ENV=production: un proceso sirve dist/ + API. HOST 0.0.0.0 para aceptar tráfico del contenedor.",
+    "PORT lo asigna Render; en Docker Compose se fija 8787 y se publica el puerto.",
+    "No hay Vite en el contenedor final: solo Node Alpine, dependencias de producción, dist/, server/ y public/ (adjuntos de correo).",
+    "TRUST_PROXY=1 para que el rate limit vea la IP del visitante detrás del proxy de Render.",
+  ]);
+  note(
+    doc,
+    "Si cambia VITE_GOOGLE_MAPS_KEY hay que reconstruir la imagen: el valor no se lee en runtime del navegador desde el entorno del contenedor, sino del bundle generado en la etapa de build.",
+  );
+
+  pageBreakBefore(doc);
+  h1(doc, "6.  Estructura del repositorio");
+  kvTable(doc, [
+    ["src/", "Aplicación React: App, componentes, estilos, tipos Vite."],
+    ["src/components/", "Header, formularios, mapas, iconos, controles i18n/tema."],
+    ["src/i18n/", "I18nProvider y locales JSON (nueve idiomas)."],
+    ["src/theme/", "ThemeProvider (claro / oscuro)."],
+    ["src/data/", "coverage.json (GeoJSON de cobertura OSM)."],
+    ["src/lib/", "Carga perezosa del script de Google Maps."],
+    ["server/", "Express (index.mjs) y plantillas de correo (email.mjs)."],
+    ["public/", "favicon, folleto, robots, imágenes de servicios."],
+    ["public/brand/", "Kit de marca en runtime (Vite copia a dist/brand/)."],
+    ["scripts/", "fetch-coverage.mjs y generate-docs.mjs (PDF locales)."],
+    ["docs/", "PDF generados. Solo local; gitignore. No van a GitHub."],
+    ["Dockerfile", "Multi-etapa: build Vite + runner Node 20 Alpine."],
+    ["docker-compose.yml", "Build local con env_file .env y puerto 8787."],
+    ["render.yaml", "Blueprint: web Docker, plan free, health /api/health."],
+    [".env.example", "Nombres y propósito de variables. Sin secretos reales."],
+    ["ARCHITECTURE.md", "Este mismo relato, versionado en GitHub."],
+  ]);
+  para(
+    doc,
+    "node_modules/ y dist/ no se versionan. package-lock.json fija las versiones. .env y src/.env están ignorados. Extraer un PDF comercial o copiar el kit fuera de public/brand/ no forma parte del diseño: la fuente de verdad de marca es public/brand/.",
+  );
+
+  h1(doc, "7.  Infraestructura");
+  h2(doc, "7.1  Docker multi-etapa");
+  para(
+    doc,
+    "Etapa build: node:20-alpine, npm ci, copia del repo, ARG/ENV de VITE_GOOGLE_MAPS_KEY y VITE_GOOGLE_MAPS_MAP_ID, npm run build. Etapa runner: npm ci --omit=dev, copia dist/, server/ y public/, NODE_ENV=production, PORT=8787, API_HOST=0.0.0.0, TRUST_PROXY=1, CMD node server/index.mjs. El .env no se copia a la imagen; los secretos entran en runtime (compose env_file o panel de Render).",
+  );
+
+  h2(doc, "7.2  Render (plan free)");
+  para(
+    doc,
+    "render.yaml declara un servicio web Docker (rose-tech), dockerfilePath ./Dockerfile, healthCheckPath /api/health y plan: free. NODE_ENV, TRUST_PROXY y API_HOST van con valor fijo. RESEND_API_KEY, RESEND_FROM, CEO_EMAIL, VITE_GOOGLE_MAPS_KEY, VITE_GOOGLE_MAPS_MAP_ID y FRONTEND_ORIGIN tienen sync: false: se pegan en el panel, no en Git. Tras el primer despliegue hay que poner FRONTEND_ORIGIN a la URL HTTPS del servicio (sin barra final) y redesplegar.",
+  );
+
+  h2(doc, "7.3  Variables de entorno (solo nombres)");
+  kvTable(doc, [
+    ["RESEND_API_KEY", "Secreto de correo. Solo servidor."],
+    ["RESEND_FROM", "Remitente; dominio verificado en producción."],
+    ["CEO_EMAIL", "Bandeja interna de leads."],
+    ["PORT / API_PORT", "Bind HTTP. Render exige PORT."],
+    ["API_HOST", "127.0.0.1 local; 0.0.0.0 en contenedor."],
+    ["FRONTEND_ORIGIN", "Orígenes CORS extra, separados por coma."],
+    ["RATE_LIMIT_WINDOW_MS", "Ventana del límite de POST /api/contact."],
+    ["RATE_LIMIT_MAX", "Máximo de envíos por IP en esa ventana."],
+    ["TRUST_PROXY", "1 detrás de proxy inverso (IP real)."],
+    ["NODE_ENV", "production oculta PII en logs."],
+    ["VITE_GOOGLE_MAPS_KEY", "Pública; restringir referrer. Build-time."],
+    ["VITE_GOOGLE_MAPS_MAP_ID", "Map ID opcional. Build-time."],
+  ]);
+  note(doc, "Este documento no incluye valores. La referencia de propósito es .env.example.");
+
+  h2(doc, "7.4  CORS, Helmet y rate limit");
+  bullets(doc, [
+    "CORS: localhost:5173, :4173 (y 127.0.0.1) más FRONTEND_ORIGIN. En producción el SPA y la API son el mismo origen.",
+    "Helmet: CSP restrictiva en respuestas JSON, sin X-Powered-By, referrer estricto, nosniff.",
+    "Rate limit: 5 POST /api/contact por IP cada 15 minutos, configurable.",
+    "Vite añade cabeceras equivalentes (Referrer-Policy, X-Content-Type-Options, X-Frame-Options, Permissions-Policy) en dev y preview.",
+  ]);
+
+  pageBreakBefore(doc);
+  h1(doc, "8.  Flujo de datos: formulario → API → Resend");
+  para(
+    doc,
+    "Es el único flujo que mueve datos personales. El visitante elige un tema cerrado (diagnóstico, cotización, Myshop, productos, asesoría, mantenimiento), escribe nombre, correo, teléfono o WhatsApp y un mensaje.",
+  );
+  bullets(doc, [
+    "1. ContactForm valida formato y longitudes en el navegador y envía POST /api/contact (JSON).",
+    "2. En local, Vite proxyfica a Express :8787. En producción, Express recibe en el mismo host.",
+    "3. Express descarta claves no permitidas, vuelve a validar, aplica rate limit y mira el honeypot.",
+    "4. Si la clave de Resend no está lista, 503. Si el honeypot está lleno, 200 sin correo.",
+    "5. Resend envía el lead a CEO_EMAIL (HTML escapado, isotipo CID) y, salvo modo de prueba @resend.dev, una confirmación al visitante.",
+    "6. El cliente muestra un aviso de texto (no HTML interpolado). Los errores de Resend se traducen a mensajes genéricos.",
+  ]);
+  para(
+    doc,
+    "No hay cola, webhook ni tabla de leads. Si Resend rechaza el dominio o la clave, el operador lo ve en logs (sin PII en production) y en el mensaje operativo del formulario. El detalle de amenaza y reporte está en SECURITY.md.",
+  );
+
+  h1(doc, "9.  Lo que esta arquitectura no es");
+  bullets(doc, [
+    "No es un CMS: el copy vive en JSON de i18n y en componentes.",
+    "No es un backend de negocio: no hay autenticación, sesiones ni roles.",
+    "No es un lago de datos: el correo es el sistema de registro de leads.",
+    "Los PDF de docs/ no se publican: npm run docs es una herramienta local.",
+  ]);
+  para(
+    doc,
+    "Ese recorte es intencional. Si más adelante ROSE necesita un panel de leads o un blog, se añadiría un servicio con persistencia; no se improvisaría una base dentro de este proceso sin un diseño nuevo.",
+  );
+
+  h1(doc, "10.  Documentos relacionados");
+  kvTable(doc, [
+    ["ARCHITECTURE.md", "Misma sustancia, en el repositorio público/privado de Git."],
+    ["README.md / README.es.md", "Arranque, Docker, Render y variables (nombres)."],
+    ["SECURITY.md", "Modelo de amenazas y cómo reportar incidentes."],
+    ["ROSE-documentacion-tecnica.pdf", "Operación detallada del sitio (local)."],
+    ["ROSE-reporte-ejecutivo.pdf", "Síntesis para dirección (local)."],
+  ]);
+  note(doc, "Uso interno. No incluye claves de API, Maps ni Resend, ni ejemplos de secretos reales.");
+
+  finish(doc, "Arquitectura de sistema");
+  return { stream, out };
+}
+
 function countPdfPages(file) {
   const text = fs.readFileSync(file).toString("latin1");
   const counts = [...text.matchAll(/\/Type\s*\/Pages\b[\s\S]{0,200}?\/Count\s+(\d+)/g)];
@@ -542,7 +838,9 @@ function countPdfPages(file) {
 
 const a = technicalPdf();
 const b = executivePdf();
-await Promise.all([waitEnd(a.stream), waitEnd(b.stream)]);
+const c = architecturePdf();
+await Promise.all([waitEnd(a.stream), waitEnd(b.stream), waitEnd(c.stream)]);
 console.log("PDF generados:");
 console.log(" ", path.relative(ROOT, a.out), `(${countPdfPages(a.out)} pages)`);
 console.log(" ", path.relative(ROOT, b.out), `(${countPdfPages(b.out)} pages)`);
+console.log(" ", path.relative(ROOT, c.out), `(${countPdfPages(c.out)} pages)`);

@@ -1,4 +1,21 @@
-[English](README.md) | [Español](README.es.md)
+<p align="center">
+  <img src="public/brand/logo-hero.png" alt="ROSE Technology" height="72">
+</p>
+
+<p align="center">
+  <a href="README.md"><img src="https://img.shields.io/badge/EN-English-111111?style=for-the-badge" alt="English"></a>
+  <a href="README.es.md"><img src="https://img.shields.io/badge/ES-Español-e10600?style=for-the-badge" alt="Español"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js 20">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render">
+  <img src="https://img.shields.io/badge/License-Proprietary-e10600?style=for-the-badge" alt="Proprietary">
+</p>
 
 # ROSE Technology — corporate site
 
@@ -6,7 +23,15 @@ Institutional website for **ROSE S.A.S.** (trade name **ROSE Technology**), a bu
 
 The site presents technical service, the **Myshop** admin product, hardware, territorial coverage, and a contact channel that emails the team.
 
-## Stack
+<p>
+  <a href="ARCHITECTURE.md"><img src="https://img.shields.io/badge/Architecture-070707?style=flat-square" alt="Architecture"></a>
+  <a href="SECURITY.md"><img src="https://img.shields.io/badge/Security-e10600?style=flat-square" alt="Security"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-5c524f?style=flat-square" alt="Changelog"></a>
+</p>
+
+---
+
+## <img src="https://cdn.simpleicons.org/react/61DAFB" width="20" height="20" alt=""> Stack
 
 | Layer | Technology |
 | --- | --- |
@@ -17,7 +42,11 @@ The site presents technical service, the **Myshop** admin product, hardware, ter
 | Maps | Google Maps JavaScript API / Embed iframe if no key |
 | Production | One Node process: static `dist/` + `POST /api/contact` |
 
-## How to run (local)
+Design decisions, folder map, and data flow: **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
+
+---
+
+## <img src="https://cdn.simpleicons.org/nodedotjs/339933" width="20" height="20" alt=""> How to run (local)
 
 Requires Node.js 20 or later.
 
@@ -51,7 +80,11 @@ Regenerate project PDFs locally (gitignored; they are **not** in the GitHub repo
 npm run docs
 ```
 
-## Environment variables
+Outputs under `docs/`: technical manual, executive report, and architecture PDF.
+
+---
+
+## <img src="https://cdn.simpleicons.org/dotenv/ECD53F" width="20" height="20" alt=""> Environment variables
 
 Names and purpose live in `.env.example`. **Never** copy real keys into README, issues, PDFs, or `render.yaml`.
 
@@ -80,7 +113,9 @@ Names and purpose live in `.env.example`. **Never** copy real keys into README, 
 
 Without `VITE_GOOGLE_MAPS_KEY` the site uses a Google Maps iframe.
 
-## Docker
+---
+
+## <img src="https://cdn.simpleicons.org/docker/2496ED" width="20" height="20" alt=""> Docker
 
 Do not bake `.env` into the image. Pass runtime secrets with `env_file` or the host environment. The Maps key is an **image build arg** because Vite inlines it.
 
@@ -97,13 +132,17 @@ docker build --build-arg VITE_GOOGLE_MAPS_KEY --build-arg VITE_GOOGLE_MAPS_MAP_I
 docker run --env-file .env -e NODE_ENV=production -e PORT=8787 -e API_HOST=0.0.0.0 -p 8787:8787 rose-tech
 ```
 
-## Render
+---
+
+## <img src="https://cdn.simpleicons.org/render/46E3B7" width="20" height="20" alt=""> Render
 
 Blueprint: [`render.yaml`](./render.yaml). Connect the GitHub repo, apply the blueprint, paste secret values in the dashboard (they are `sync: false` — not stored in Git). After the first deploy, set `FRONTEND_ORIGIN` to `https://<service>.onrender.com` (no trailing slash) and trigger a **redeploy** so CORS matches. If you add or change `VITE_GOOGLE_MAPS_KEY`, rebuild the Docker image so Vite can inline it.
 
 See [SECURITY.md](./SECURITY.md) before going live.
 
-## Scripts
+---
+
+## <img src="https://cdn.simpleicons.org/gnubash/4EAA25" width="20" height="20" alt=""> Scripts
 
 | Script | What it does |
 | --- | --- |
@@ -117,7 +156,9 @@ See [SECURITY.md](./SECURITY.md) before going live.
 
 Exact dependency versions are in `package-lock.json`.
 
-## Layout
+---
+
+## <img src="https://cdn.simpleicons.org/git/e10600" width="20" height="20" alt=""> Layout
 
 ```
 public/brand/          Brand assets the site and email use
@@ -131,7 +172,10 @@ scripts/               Coverage fetch, PDF generator
 docs/                  Local PDFs from `npm run docs` (gitignored)
 Dockerfile             Multi-stage production image
 render.yaml            Render blueprint
+ARCHITECTURE.md        System architecture (GitHub)
 ```
+
+---
 
 ## Internationalization
 
@@ -169,4 +213,4 @@ Runtime assets live only in `public/brand/` (hero block, header marks, WhatsApp 
 
 ## License
 
-Site code and content: internal use by ROSE S.A.S. unless otherwise agreed.
+No public open-source license is published. Site code and content are for **internal use by ROSE S.A.S.** unless otherwise agreed.
