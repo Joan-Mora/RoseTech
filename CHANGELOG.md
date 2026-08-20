@@ -11,10 +11,18 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 - Repository [ARCHITECTURE.md](./ARCHITECTURE.md).
 - Visual bilingual READMEs (shields, language switcher, no emoji) and this changelog.
+- Shared `bodyLock` helper for nav drawer and brochure modal scroll locking.
+- SVG icons on cards, process steps, products, why-us, team, and coverage sections.
 
 ### Changed
 
 - Mobile navigation lock is scoped to the hamburger breakpoint so desktop layout is not stuck after resize.
+- Sections 3/4 alternate light and stronger dark banding for clearer visual rhythm.
+- Sticky nav red-pill scroll-spy syncs with click navigation (smooth scroll + brief spy ignore).
+
+### Fixed
+
+- Brochure modal no longer shows a black bar under the sticky header (portal to `document.body` plus modal-open nav paint).
 
 ## [1.0.0] — 2026-08-19
 

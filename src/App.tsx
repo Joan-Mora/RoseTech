@@ -1,16 +1,65 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import BrochureDownload from "./components/BrochureDownload";
 import ContactForm from "./components/ContactForm";
 import CoverageMap from "./components/CoverageMap";
 import Header from "./components/Header";
 import LocationMap from "./components/LocationMap";
 import WhatsAppIcon from "./components/WhatsAppIcon";
-import { IconClock, IconMail, IconPhone, IconPin, IconShop } from "./components/ContactIcons";
+import {
+  IconBadge,
+  IconBriefcase,
+  IconBuilding,
+  IconCable,
+  IconCamera,
+  IconChat,
+  IconClipboard,
+  IconClock,
+  IconCode,
+  IconDesktop,
+  IconHome,
+  IconLaptop,
+  IconLock,
+  IconMail,
+  IconMap,
+  IconPen,
+  IconPhone,
+  IconPin,
+  IconRefresh,
+  IconRocket,
+  IconSchool,
+  IconSearch,
+  IconShield,
+  IconShop,
+  IconSpeaker,
+  IconStar,
+  IconTablet,
+  IconUsers,
+  IconWrench,
+} from "./components/ContactIcons";
 import { COMPANY, SERVICE_DEVICE_PHOTOS } from "./content";
 import { useI18n } from "./i18n/I18nProvider";
 import { useTheme } from "./theme/ThemeProvider";
 
 const wa = `https://wa.me/${COMPANY.phoneE164}`;
+
+const SERVICE_EXTRA_ICONS = [IconCamera, IconWrench, IconClipboard] as const;
+const PROCESS_ICONS = [IconSearch, IconPen, IconCode, IconRocket] as const;
+const PRODUCT_ICONS = [IconDesktop, IconLaptop, IconCamera, IconTablet, IconSpeaker, IconCable] as const;
+const WHY_ICONS = [IconClipboard, IconShield, IconChat, IconRefresh] as const;
+const TEAM_CARD_ICONS = [IconBadge, IconUsers, IconStar, IconLock] as const;
+const COVERAGE_ICONS = [IconBuilding, IconHome, IconSchool] as const;
+const VALUE_ICONS = [IconStar, IconBadge, IconBriefcase, IconMap] as const;
+
+function CardTitle({ icon, children }: { icon: ReactNode; children: ReactNode }) {
+  return (
+    <div className="card-title">
+      <span className="card-ico" aria-hidden="true">
+        {icon}
+      </span>
+      <h3>{children}</h3>
+    </div>
+  );
+}
 
 function JsonLd() {
   const data = {
@@ -141,12 +190,15 @@ export default function App() {
               </article>
             </div>
             <div className="grid-4" style={{ marginTop: "1.4rem" }}>
-              {m.about.values.map((item) => (
-                <article className="card" key={item.title}>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </article>
-              ))}
+              {m.about.values.map((item, i) => {
+                const Icon = VALUE_ICONS[i] ?? IconStar;
+                return (
+                  <article className="card" key={item.title}>
+                    <CardTitle icon={<Icon />}>{item.title}</CardTitle>
+                    <p>{item.text}</p>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -169,12 +221,15 @@ export default function App() {
               ))}
             </div>
             <div className="grid-3" style={{ marginTop: "1rem" }}>
-              {m.services.extras.map((item) => (
-                <article className="card accent" key={item.title}>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </article>
-              ))}
+              {m.services.extras.map((item, i) => {
+                const Icon = SERVICE_EXTRA_ICONS[i] ?? IconWrench;
+                return (
+                  <article className="card accent" key={item.title}>
+                    <CardTitle icon={<Icon />}>{item.title}</CardTitle>
+                    <p>{item.text}</p>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -219,12 +274,18 @@ export default function App() {
               </article>
             </div>
             <div className="steps">
-              {m.software.steps.map((step) => (
-                <div className="step" key={step.code}>
-                  <b>{step.code}</b>
-                  {step.text}
-                </div>
-              ))}
+              {m.software.steps.map((step, i) => {
+                const Icon = PROCESS_ICONS[i] ?? IconCode;
+                return (
+                  <div className="step" key={step.code}>
+                    <span className="step-ico" aria-hidden="true">
+                      <Icon />
+                    </span>
+                    <b>{step.code}</b>
+                    {step.text}
+                  </div>
+                );
+              })}
             </div>
             <p className="lede" style={{ marginTop: "1.4rem" }}>
               {m.software.process}
@@ -232,7 +293,7 @@ export default function App() {
           </div>
         </section>
 
-        <section id="productos" className="section">
+        <section id="productos" className="section section-alt">
           <div className="wrap">
             <div className="section-head">
               <p className="eyebrow">{m.products.eyebrow}</p>
@@ -240,12 +301,15 @@ export default function App() {
               <p className="lede">{m.products.lede}</p>
             </div>
             <div className="grid-3">
-              {m.products.items.map((item) => (
-                <article className="card" key={item.title}>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </article>
-              ))}
+              {m.products.items.map((item, i) => {
+                const Icon = PRODUCT_ICONS[i] ?? IconDesktop;
+                return (
+                  <article className="card" key={item.title}>
+                    <CardTitle icon={<Icon />}>{item.title}</CardTitle>
+                    <p>{item.text}</p>
+                  </article>
+                );
+              })}
             </div>
             <p className="card accent" style={{ marginTop: "1rem" }}>
               {m.products.note}
@@ -253,7 +317,7 @@ export default function App() {
           </div>
         </section>
 
-        <section id="por-que" className="section section-alt">
+        <section id="por-que" className="section">
           <div className="wrap">
             <div className="section-head">
               <p className="eyebrow">{m.why.eyebrow}</p>
@@ -270,17 +334,20 @@ export default function App() {
               ))}
             </div>
             <div className="grid-4" style={{ marginTop: "1rem" }}>
-              {m.why.cards.map((item) => (
-                <article className="card accent" key={item.title}>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </article>
-              ))}
+              {m.why.cards.map((item, i) => {
+                const Icon = WHY_ICONS[i] ?? IconShield;
+                return (
+                  <article className="card accent" key={item.title}>
+                    <CardTitle icon={<Icon />}>{item.title}</CardTitle>
+                    <p>{item.text}</p>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        <section id="equipo" className="section">
+        <section id="equipo" className="section section-alt">
           <div className="wrap">
             <div className="section-head">
               <p className="eyebrow">{m.team.eyebrow}</p>
@@ -289,7 +356,7 @@ export default function App() {
             </div>
             <div className="grid-2">
               <article className="card accent">
-                <h3>{m.team.techTitle}</h3>
+                <CardTitle icon={<IconWrench />}>{m.team.techTitle}</CardTitle>
                 <p>{m.team.techText}</p>
                 <ul>
                   {m.team.techItems.map((item) => (
@@ -298,7 +365,7 @@ export default function App() {
                 </ul>
               </article>
               <article className="card">
-                <h3>{m.team.devTitle}</h3>
+                <CardTitle icon={<IconCode />}>{m.team.devTitle}</CardTitle>
                 <p>{m.team.devText}</p>
                 <ul>
                   {m.team.devItems.map((item) => (
@@ -308,17 +375,20 @@ export default function App() {
               </article>
             </div>
             <div className="grid-4" style={{ marginTop: "1rem" }}>
-              {m.team.cards.map((item) => (
-                <article className="card" key={item.title}>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </article>
-              ))}
+              {m.team.cards.map((item, i) => {
+                const Icon = TEAM_CARD_ICONS[i] ?? IconUsers;
+                return (
+                  <article className="card" key={item.title}>
+                    <CardTitle icon={<Icon />}>{item.title}</CardTitle>
+                    <p>{item.text}</p>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        <section id="cobertura" className="section section-alt">
+        <section id="cobertura" className="section">
           <div className="wrap">
             <div className="section-head">
               <p className="eyebrow">{m.coverage.eyebrow}</p>
@@ -343,17 +413,20 @@ export default function App() {
               </div>
             </div>
             <div className="grid-3" style={{ marginTop: "1.2rem" }}>
-              {m.coverage.audiences.map((item) => (
-                <article className="card accent" key={item.title}>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </article>
-              ))}
+              {m.coverage.audiences.map((item, i) => {
+                const Icon = COVERAGE_ICONS[i] ?? IconBuilding;
+                return (
+                  <article className="card accent" key={item.title}>
+                    <CardTitle icon={<Icon />}>{item.title}</CardTitle>
+                    <p>{item.text}</p>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        <section id="contacto" className="section">
+        <section id="contacto" className="section section-alt">
           <div className="wrap">
             <div className="section-head">
               <p className="eyebrow">{m.contact.eyebrow}</p>

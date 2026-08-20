@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { COMPANY } from "../content";
 import BrochureDownload from "./BrochureDownload";
 import { useI18n } from "../i18n/I18nProvider";
+import { forceUnlockBody, lockBody, unlockBody } from "../lib/bodyLock";
 import { useTheme } from "../theme/ThemeProvider";
 import { LanguageSwitcher, ThemeToggle } from "./SiteControls";
 
@@ -20,60 +21,14 @@ const NAV_HREFS = [
 /** Matches CSS hamburger breakpoint: `@media (max-width: 1279px)`. */
 const DESKTOP_NAV_MQ = "(min-width: 1280px)";
 
-let touchMoveGuard: ((e: TouchEvent) => void) | null = null;
-
-function unlockBody() {
-  const html = document.documentElement;
-  const body = document.body;
-  const lockedTop = body.style.top;
-
-  html.classList.remove("nav-lock");
-  body.classList.remove("nav-lock");
-  html.style.removeProperty("overflow");
-  body.style.removeProperty("overflow");
-  body.style.removeProperty("position");
-  body.style.removeProperty("top");
-  body.style.removeProperty("left");
-  body.style.removeProperty("right");
-  body.style.removeProperty("width");
-  body.style.removeProperty("padding-right");
-  html.style.removeProperty("padding-right");
-
-  if (touchMoveGuard) {
-    document.removeEventListener("touchmove", touchMoveGuard);
-    touchMoveGuard = null;
-  }
-
-  if (lockedTop) {
-    const y = Math.abs(Number.parseInt(lockedTop, 10) || 0);
-    window.scrollTo(0, y);
-  }
-}
-
-function lockBody() {
-  const html = document.documentElement;
-  const body = document.body;
-  const scrollY = window.scrollY;
-
-  if (touchMoveGuard) {
-    document.removeEventListener("touchmove", touchMoveGuard);
-    touchMoveGuard = null;
-  }
-
-  html.classList.add("nav-lock");
-  body.classList.add("nav-lock");
-  body.style.top = `-${scrollY}px`;
-
-  touchMoveGuard = (e: TouchEvent) => {
-    const drawer = document.getElementById("mobile-nav");
-    if (drawer?.contains(e.target as Node)) return;
-    e.preventDefault();
-  };
-  document.addEventListener("touchmove", touchMoveGuard, { passive: false });
-}
-
 function isDesktopNav() {
   return window.matchMedia(DESKTOP_NAV_MQ).matches;
+}
+
+function navOffsetPx() {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue("--nav-h").trim();
+  const n = Number.parseFloat(raw);
+  return Number.isFinite(n) ? n : 76;
 }
 
 export default function Header() {
@@ -81,6 +36,7 @@ export default function Header() {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("#inicio");
+  const ignoreSpyUntil = useRef(0);
   const mark = theme === "light" ? "./brand/logo-mark-red.png" : "./brand/logo-mark.png";
 
   const items = useMemo(
@@ -90,20 +46,47 @@ export default function Header() {
 
   useEffect(() => {
     const ids = items.map((n) => n.href.slice(1));
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const vis = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (vis?.target.id) setActive(`#${vis.target.id}`);
-      },
-      { rootMargin: "-35% 0px -50% 0px", threshold: [0.1, 0.25, 0.5] },
-    );
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
-    return () => obs.disconnect();
+
+    const syncFromScroll = () => {
+      if (performance.now() < ignoreSpyUntil.current) return;
+      const probe = navOffsetPx() + 16;
+      let current = `#${ids[0]}`;
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= probe) current = `#${id}`;
+      }
+      setActive((prev) => (prev === current ? prev : current));
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        syncFromScroll();
+      });
+    };
+
+    const onHash = () => {
+      const hash = window.location.hash;
+      if (hash && ids.includes(hash.slice(1))) {
+        ignoreSpyUntil.current = performance.now() + 700;
+        setActive(hash);
+      }
+    };
+
+    syncFromScroll();
+    onHash();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("hashchange", onHash);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("hashchange", onHash);
+      window.removeEventListener("resize", onScroll);
+    };
   }, [items]);
 
   useEffect(() => {
@@ -118,7 +101,7 @@ export default function Header() {
     const closeIfDesktop = () => {
       if (!isDesktopNav()) return;
       setOpen(false);
-      unlockBody();
+      forceUnlockBody();
     };
 
     closeIfDesktop();
@@ -132,17 +115,25 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    if (!open || isDesktopNav()) {
-      unlockBody();
-      return;
-    }
-
+    if (!open || isDesktopNav()) return;
     lockBody();
     return () => unlockBody();
   }, [open]);
 
+  const goTo = (href: string) => (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    ignoreSpyUntil.current = performance.now() + 700;
+    setActive(href);
+    setOpen(false);
+    const el = document.getElementById(href.slice(1));
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.pushState(null, "", href);
+    }
+  };
+
   const BrandLink = () => (
-    <a className="brand" href="#inicio" onClick={() => setOpen(false)}>
+    <a className="brand" href="#inicio" onClick={goTo("#inicio")}>
       <img src={mark} alt={m.hero.logoAlt} width={48} height={58} />
       <span>
         <strong>ROSE S.A.S.</strong>
@@ -161,7 +152,11 @@ export default function Header() {
             <ul className="nav-links">
               {items.map((item) => (
                 <li key={item.href}>
-                  <a href={item.href} className={active === item.href ? "active" : undefined}>
+                  <a
+                    href={item.href}
+                    className={active === item.href ? "active" : undefined}
+                    onClick={goTo(item.href)}
+                  >
                     {item.label}
                   </a>
                 </li>
@@ -175,7 +170,7 @@ export default function Header() {
               <ThemeToggle />
             </div>
             <BrochureDownload className="btn btn-ghost nav-desktop-action">{m.nav.brochure}</BrochureDownload>
-            <a className="btn btn-primary nav-desktop-action" href="#contacto">
+            <a className="btn btn-primary nav-desktop-action" href="#contacto" onClick={goTo("#contacto")}>
               {m.nav.contactCta}
             </a>
             <button
@@ -215,7 +210,7 @@ export default function Header() {
                   <a
                     href={item.href}
                     className={active === item.href ? "active" : undefined}
-                    onClick={() => setOpen(false)}
+                    onClick={goTo(item.href)}
                   >
                     {item.label}
                   </a>
@@ -228,7 +223,7 @@ export default function Header() {
             <LanguageSwitcher variant="stack" />
           </div>
           <div className="drawer-actions">
-            <a className="btn btn-primary" href="#contacto" onClick={() => setOpen(false)}>
+            <a className="btn btn-primary" href="#contacto" onClick={goTo("#contacto")}>
               {m.nav.contactCta}
             </a>
             <BrochureDownload className="btn btn-ghost" onNavigate={() => setOpen(false)}>
