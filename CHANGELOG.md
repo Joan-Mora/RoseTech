@@ -28,6 +28,7 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ### Fixed
 
+- Theme toggle works more reliably across browsers (including Samsung Internet Force Dark): set `data-theme` and `color-scheme` early via a boot script so light mode is not stuck dark.
 - Brochure modal no longer shows a black bar under the sticky header (portal to `document.body` plus modal-open nav paint).
 - Coverage map polygons stay red and the selected sede location is preserved when switching language.
 

@@ -1,4 +1,13 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export type Theme = "light" | "dark";
 
@@ -17,44 +26,115 @@ function readStored(): Theme | null {
     const raw = localStorage.getItem(STORAGE);
     if (raw === "light" || raw === "dark") return raw;
   } catch {
-    /* private mode */
+    /* private / blocked storage */
   }
   return null;
 }
 
-function preferTheme(): Theme {
+function systemTheme(): Theme {
   if (typeof window === "undefined") return "dark";
-  const stored = readStored();
-  if (stored) return stored;
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  try {
+    return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  } catch {
+    return "dark";
+  }
+}
+
+function preferTheme(): Theme {
+  return readStored() ?? systemTheme();
 }
 
 function applyTheme(theme: Theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  document.documentElement.style.colorScheme = theme;
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", theme === "light" ? "#f3eee6" : "#0a0a0a");
+  const root = document.documentElement;
+  root.setAttribute("data-theme", theme);
+  root.classList.remove("theme-light", "theme-dark");
+  root.classList.add(theme === "light" ? "theme-light" : "theme-dark");
+
+  /* setProperty is more reliable than style.colorScheme on some Chromium forks (Samsung Internet). */
+  try {
+    root.style.setProperty("color-scheme", theme);
+  } catch {
+    /* ignore */
+  }
+  try {
+    (root.style as CSSStyleDeclaration & { colorScheme?: string }).colorScheme = theme;
+  } catch {
+    /* ignore */
+  }
+
+  const themeColor = document.querySelector('meta[name="theme-color"]');
+  if (themeColor) themeColor.setAttribute("content", theme === "light" ? "#f3eee6" : "#0a0a0a");
+
+  const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
+  if (colorSchemeMeta) colorSchemeMeta.setAttribute("content", theme);
+}
+
+function persistTheme(theme: Theme) {
+  try {
+    localStorage.setItem(STORAGE, theme);
+  } catch {
+    /* ignore */
+  }
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => preferTheme());
 
-  useEffect(() => {
+  const setTheme = useCallback((next: Theme) => {
+    applyTheme(next);
+    persistTheme(next);
+    setThemeState(next);
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setThemeState((prev) => {
+      const next: Theme = prev === "dark" ? "light" : "dark";
+      applyTheme(next);
+      persistTheme(next);
+      return next;
+    });
+  }, []);
+
+  /* Sync DOM before paint so CSS variables / color-scheme match React state. */
+  useLayoutEffect(() => {
     applyTheme(theme);
-    try {
-      localStorage.setItem(STORAGE, theme);
-    } catch {
-      /* ignore */
-    }
   }, [theme]);
+
+  useEffect(() => {
+    persistTheme(theme);
+  }, [theme]);
+
+  /* Follow system preference only when the user has no stored choice. */
+  useEffect(() => {
+    let mq: MediaQueryList;
+    try {
+      mq = window.matchMedia("(prefers-color-scheme: light)");
+    } catch {
+      return;
+    }
+
+    const onChange = () => {
+      if (readStored()) return;
+      const next: Theme = mq.matches ? "light" : "dark";
+      applyTheme(next);
+      setThemeState(next);
+    };
+
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", onChange);
+      return () => mq.removeEventListener("change", onChange);
+    }
+    mq.addListener(onChange);
+    return () => mq.removeListener(onChange);
+  }, []);
 
   const value = useMemo<Ctx>(
     () => ({
       theme,
-      setTheme: setThemeState,
-      toggleTheme: () => setThemeState((t) => (t === "dark" ? "light" : "dark")),
+      setTheme,
+      toggleTheme,
     }),
-    [theme],
+    [theme, setTheme, toggleTheme],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

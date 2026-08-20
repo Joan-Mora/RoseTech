@@ -2,16 +2,34 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <!-- Theme before CSS: avoids FOUC and signals color-scheme for Samsung Internet Force Dark. -->
     <script>
       (function () {
+        var t = "dark";
         try {
-          var t = localStorage.getItem("rose-theme");
-          if (t !== "light" && t !== "dark") {
-            t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          var stored = localStorage.getItem("rose-theme");
+          if (stored === "light" || stored === "dark") {
+            t = stored;
+          } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+            t = "light";
           }
-          document.documentElement.setAttribute("data-theme", t);
-          document.documentElement.style.colorScheme = t;
         } catch (e) {}
+        var root = document.documentElement;
+        root.setAttribute("data-theme", t);
+        root.classList.remove("theme-light", "theme-dark");
+        root.classList.add(t === "light" ? "theme-light" : "theme-dark");
+        try {
+          root.style.setProperty("color-scheme", t);
+        } catch (e) {}
+        try {
+          root.style.colorScheme = t;
+        } catch (e) {}
+        var cs = document.querySelector('meta[name="color-scheme"]');
+        if (cs) cs.setAttribute("content", t);
+        var tc = document.querySelector('meta[name="theme-color"]');
+        if (tc) tc.setAttribute("content", t === "light" ? "#f3eee6" : "#0a0a0a");
       })();
     </script>
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png" />
@@ -29,7 +47,6 @@
       http-equiv="Permissions-Policy"
       content="camera=(), microphone=(), geolocation=(), payment=(), usb=()"
     />
-    <meta name="theme-color" content="#0a0a0a" />
     <title>ROSE Technology</title>
     <meta
       name="description"

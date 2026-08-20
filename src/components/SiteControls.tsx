@@ -8,12 +8,24 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   const { theme, toggleTheme } = useTheme();
   const { m } = useI18n();
   const toLight = theme === "dark";
+  const lastToggleAt = useRef(0);
+
+  const onToggle = () => {
+    const now = Date.now();
+    /* Samsung Internet can fire both pointerup and click, or drop click — debounce. */
+    if (now - lastToggleAt.current < 320) return;
+    lastToggleAt.current = now;
+    toggleTheme();
+  };
+
   return (
     <button
       type="button"
       className={`icon-btn ${className}`.trim()}
-      onClick={toggleTheme}
+      onClick={onToggle}
+      onPointerUp={onToggle}
       aria-label={toLight ? m.a11y.themeToLight : m.a11y.themeToDark}
+      aria-pressed={theme === "dark"}
       title={toLight ? m.a11y.themeToLight : m.a11y.themeToDark}
     >
       {toLight ? (
