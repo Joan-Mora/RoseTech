@@ -19,9 +19,9 @@
 
 # ROSE Technology — corporate site
 
-Institutional website for **ROSE** (trade name **ROSE Technology**), a business systems repair and optimization center in Villavicencio, Meta, Colombia.
+Institutional website for **ROSE** (trade name **ROSE Technology**), a business systems repair and optimization center with headquarters in **Villavicencio**, **Bogotá**, and **Cali**, Colombia.
 
-The site presents technical service, the **Myshop** admin product, hardware, territorial coverage, and a contact channel that emails the team.
+The site presents technical service, the **Myshop** admin product, hardware, multi-sede coverage maps, a downloadable **catalog** PDF, and a contact channel that emails the team (`LEAD_TO`).
 
 <p>
   <a href="ARCHITECTURE.md"><img src="https://img.shields.io/badge/Architecture-070707?style=flat-square" alt="Architecture"></a>
@@ -40,7 +40,8 @@ The site presents technical service, the **Myshop** admin product, hardware, ter
 | Contact API | [Express](https://expressjs.com/) 5 (`server/index.mjs`) |
 | Mail | [Resend](https://resend.com/) (key **only on the server**) |
 | Maps | Google Maps JavaScript API / Embed iframe if no key |
-| Production | One Node process: static `dist/` + `POST /api/contact` |
+| i18n | Custom `I18nProvider` + JSON locales (**not** i18next) |
+| Production | Docker / Render **free**: one Node process serves `dist/` + `/api` |
 
 Design decisions, folder map, and data flow: **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
 
@@ -129,7 +130,7 @@ docker run --env-file .env -e NODE_ENV=production -e PORT=8787 -e API_HOST=0.0.0
 
 ## <img src="https://cdn.simpleicons.org/render/46E3B7" width="20" height="20" alt=""> Render
 
-Blueprint: [`render.yaml`](./render.yaml). Connect the GitHub repo, apply the blueprint, paste secret values in the dashboard (they are `sync: false` — not stored in Git). After the first deploy, set `FRONTEND_ORIGIN` to `https://<service>.onrender.com` (no trailing slash) and trigger a **redeploy** so CORS matches. If you add or change `VITE_GOOGLE_MAPS_KEY`, rebuild the Docker image so Vite can inline it.
+Blueprint: [`render.yaml`](./render.yaml) (Docker, **free** plan). Connect the GitHub repo, apply the blueprint, paste secret values in the dashboard (`sync: false` — not stored in Git): `RESEND_*`, `LEAD_TO` (preferred) or `CEO_EMAIL`, `VITE_GOOGLE_MAPS_*`, `FRONTEND_ORIGIN`. Fixed in Git: `NODE_ENV`, `TRUST_PROXY`, `API_HOST`. After the first deploy, set `FRONTEND_ORIGIN` to `https://<service>.onrender.com` (no trailing slash) and **redeploy** so CORS matches. If you add or change `VITE_GOOGLE_MAPS_KEY`, rebuild the Docker image so Vite can inline it.
 
 See [SECURITY.md](./SECURITY.md) before going live.
 
@@ -153,46 +154,62 @@ Exact dependency versions are in `package-lock.json`.
 ## <img src="https://cdn.simpleicons.org/git/e10600" width="20" height="20" alt=""> Layout
 
 ```
-public/brand/          Brand assets the site and email use
-public/images/         Service photos
-server/                Express API + mail templates
-src/                   React app
-src/i18n/              Translations and locale provider
-src/theme/             Light / dark theme
-src/data/coverage.json Coverage polygons (OSM)
-scripts/               Coverage fetch
-Dockerfile             Multi-stage production image
-render.yaml            Render blueprint
-ARCHITECTURE.md        System architecture (GitHub)
+public/brand/                       Brand assets the site and email use
+public/catalogo-rose-technology.pdf Catalog download (deployed with the site)
+public/images/                      Service photos
+server/                             Express API + mail templates (LEAD_TO)
+src/                                React app
+src/content.ts                      COMPANY + three SEDES (HQ addresses)
+src/i18n/                           Custom I18nProvider + locale JSON
+src/theme/                          Light / dark theme
+src/data/coverage.json              Coverage polygons by sede (OSM)
+scripts/                            Coverage fetch (OSM)
+Dockerfile                          Multi-stage production image
+render.yaml                         Render free-plan blueprint
+ARCHITECTURE.md                     System architecture (GitHub)
 ```
+
+Local-only (gitignored): `docs/*.pdf` and `scripts/generate-docs.mjs`.
 
 ---
 
 ## Internationalization
 
-Nine languages: Spanish (default), English, French, Simplified Chinese, Brazilian Portuguese, German, Japanese, Italian, and Korean. Copy lives in `src/i18n/locales/*.json`. The picker stores the preference in `localStorage`.
+Nine languages: Spanish (default), English, French, Simplified Chinese, Brazilian Portuguese, German, Japanese, Italian, and Korean. Custom `I18nProvider` + `src/i18n/locales/*.json` (**not** i18next). The picker stores the preference in `localStorage`.
 
 ## Theme
 
-Light and dark, with initial `prefers-color-scheme` and persistence in `localStorage` (`rose-theme`). The map styles follow the theme.
+Light and dark, with initial `prefers-color-scheme` and persistence in `localStorage` (`rose-theme`). An early script in `index.html` sets `data-theme` and `color-scheme` before paint (helps Samsung Internet Force Dark and similar). Map styles follow the theme.
 
 ## Maps and coverage
 
-- **HQ:** location map (JavaScript API with a key, or iframe).
-- **Coverage:** urban polygons for Meta municipalities plus a departmental polygon for remote service. Data is generated with `scripts/fetch-coverage.mjs` into `src/data/coverage.json`.
+Three sedes (selector on location and coverage):
+
+| Sede | HQ | Coverage |
+| --- | --- | --- |
+| Villavicencio | Cra. 39 #10 51 | Meta on-site municipalities + department-wide remote |
+| Bogotá | Cra. 120 #17F-63, Fontibón | City only |
+| Cali | Cra. 5 #7 32, COMUNA 3 | City only |
+
+- **Location:** JavaScript API with a key, or iframe; changing language does **not** remount the map (selected sede stays).
+- **Coverage:** GeoJSON from `scripts/fetch-coverage.mjs` → `src/data/coverage.json`.
+
+## Catalog
+
+Header / nav / footer use `BrochureDownload` to serve `public/catalogo-rose-technology.pdf` (tracked for deploy). This replaces the old presentation PDF.
 
 ## Contact form
 
 The visitor picks a topic (diagnosis, quote, Myshop, products, advisory, maintenance), leaves details, and a message. The client validates and sends `POST /api/contact`. The server validates again, rate-limits, and if Resend is configured:
 
-1. Notifies every address in `LEAD_TO` (or `CEO_EMAIL` fallback) in one send (escaped HTML).
+1. Notifies every address in `LEAD_TO` (preferred; comma-separated) or `CEO_EMAIL` fallback in one send (escaped HTML).
 2. Sends a confirmation to the visitor (except `resend.dev` test mode).
 
 A hidden honeypot field catches bots. Error messages are rendered as text, not HTML.
 
 ## Brand
 
-Runtime assets live only in `public/brand/` (hero block, header marks, WhatsApp icon). Vite copies them to `dist/brand/`. Email attaches `logo-mark-red.png` from disk.
+Runtime assets live only in `public/brand/` (hero block, header marks, WhatsApp icon). Vite copies them to `dist/brand/`. Email attaches `logo-mark-red.png` from disk. Branding is **ROSE** / **ROSE Technology** (no “S.A.S.” suffix).
 
 ## Production checklist
 

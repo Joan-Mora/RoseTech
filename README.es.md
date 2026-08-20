@@ -19,9 +19,9 @@
 
 # ROSE Technology — Sitio corporativo
 
-Sitio web institucional de **ROSE** (marca comercial **ROSE Technology**), centro de reparación y optimización de sistemas empresariales con sede en Villavicencio, Meta, Colombia.
+Sitio web institucional de **ROSE** (marca comercial **ROSE Technology**), centro de reparación y optimización de sistemas empresariales con sedes en **Villavicencio**, **Bogotá** y **Cali**, Colombia.
 
-Presenta la oferta de servicio técnico, el software administrativo **Myshop**, productos tecnológicos, cobertura territorial y un canal de contacto que notifica al equipo por correo.
+Presenta la oferta de servicio técnico, el software administrativo **Myshop**, productos tecnológicos, mapas de cobertura multi-sede, descarga del **catálogo** PDF y un canal de contacto que notifica al equipo por correo (`LEAD_TO`).
 
 <p>
   <a href="ARCHITECTURE.md"><img src="https://img.shields.io/badge/Arquitectura-070707?style=flat-square" alt="Arquitectura"></a>
@@ -40,7 +40,8 @@ Presenta la oferta de servicio técnico, el software administrativo **Myshop**, 
 | API de contacto | [Express](https://expressjs.com/) 5 (`server/index.mjs`) |
 | Correo | [Resend](https://resend.com/) (clave **solo en el servidor**) |
 | Mapas | Google Maps JavaScript API / iframe Embed si no hay clave |
-| Producción | Un proceso Node: estáticos `dist/` + `POST /api/contact` |
+| i18n | `I18nProvider` propio + JSON (**no** i18next) |
+| Producción | Docker / Render **free**: un proceso Node sirve `dist/` + `/api` |
 
 Decisiones de diseño, mapa de carpetas y flujo de datos: **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
 
@@ -129,7 +130,7 @@ docker run --env-file .env -e NODE_ENV=production -e PORT=8787 -e API_HOST=0.0.0
 
 ## <img src="https://cdn.simpleicons.org/render/46E3B7" width="20" height="20" alt=""> Render
 
-Blueprint: [`render.yaml`](./render.yaml). Conecte el repositorio de GitHub, aplique el blueprint y pegue los valores secretos en el panel (`sync: false`: no van a Git). Tras el primer despliegue, defina `FRONTEND_ORIGIN` como `https://<servicio>.onrender.com` (sin barra final) y vuelva a desplegar para CORS. Si cambia `VITE_GOOGLE_MAPS_KEY`, reconstruya la imagen Docker para que Vite la incruste.
+Blueprint: [`render.yaml`](./render.yaml) (Docker, plan **free**). Conecte el repositorio de GitHub, aplique el blueprint y pegue los secretos en el panel (`sync: false`: no van a Git): `RESEND_*`, `LEAD_TO` (preferido) o `CEO_EMAIL`, `VITE_GOOGLE_MAPS_*`, `FRONTEND_ORIGIN`. Fijos en Git: `NODE_ENV`, `TRUST_PROXY`, `API_HOST`. Tras el primer despliegue, defina `FRONTEND_ORIGIN` como `https://<servicio>.onrender.com` (sin barra final) y **vuelva a desplegar** para CORS. Si cambia `VITE_GOOGLE_MAPS_KEY`, reconstruya la imagen Docker para que Vite la incruste.
 
 Revise [SECURITY.md](./SECURITY.md) antes de publicar.
 
@@ -153,46 +154,62 @@ Las versiones exactas de dependencias quedan en `package-lock.json`.
 ## <img src="https://cdn.simpleicons.org/git/e10600" width="20" height="20" alt=""> Estructura
 
 ```
-public/brand/          Activos de marca que sirven el sitio y el correo
-public/images/         Fotografías de servicios
-server/                API Express + plantillas de correo
-src/                   Aplicación React
-src/i18n/              Traducciones y proveedor de idioma
-src/theme/             Tema claro / oscuro
-src/data/coverage.json Polígonos de cobertura (OSM)
-scripts/               Cobertura OSM
-Dockerfile             Imagen de producción multi-etapa
-render.yaml            Blueprint de Render
-ARCHITECTURE.md        Arquitectura del sistema (GitHub)
+public/brand/                       Activos de marca (sitio y correo)
+public/catalogo-rose-technology.pdf Catálogo descargable (va al deploy)
+public/images/                      Fotografías de servicios
+server/                             API Express + plantillas (LEAD_TO)
+src/                                Aplicación React
+src/content.ts                      COMPANY + tres SEDES (direcciones HQ)
+src/i18n/                           I18nProvider propio + JSON de idioma
+src/theme/                          Tema claro / oscuro
+src/data/coverage.json              Polígonos por sede (OSM)
+scripts/                            Cobertura OSM
+Dockerfile                          Imagen de producción multi-etapa
+render.yaml                         Blueprint Render (plan free)
+ARCHITECTURE.md                     Arquitectura del sistema (GitHub)
 ```
+
+Solo local (gitignored): `docs/*.pdf` y `scripts/generate-docs.mjs`.
 
 ---
 
 ## Internacionalización
 
-Nueve idiomas: español (predeterminado), inglés, francés, chino simplificado, portugués de Brasil, alemán, japonés, italiano y coreano. Los textos viven en `src/i18n/locales/*.json`. El selector persiste la preferencia en `localStorage`.
+Nueve idiomas: español (predeterminado), inglés, francés, chino simplificado, portugués de Brasil, alemán, japonés, italiano y coreano. `I18nProvider` propio + `src/i18n/locales/*.json` (**no** i18next). El selector persiste la preferencia en `localStorage`.
 
 ## Tema
 
-Claro y oscuro, con detección inicial de `prefers-color-scheme` y persistencia en `localStorage` (`rose-theme`). El mapa aplica estilos acordes al tema.
+Claro y oscuro, con detección inicial de `prefers-color-scheme` y persistencia en `localStorage` (`rose-theme`). Un script temprano en `index.html` fija `data-theme` y `color-scheme` antes del pintado (ayuda con Samsung Internet Force Dark y similares). El mapa aplica estilos acordes al tema.
 
 ## Mapas y cobertura
 
-- **Sede:** mapa de ubicación (JavaScript API con clave, o iframe).
-- **Cobertura:** polígonos urbanos de municipios del Meta y un polígono departamental para servicio remoto. Los datos se generan con `scripts/fetch-coverage.mjs` hacia `src/data/coverage.json`.
+Tres sedes (selector en ubicación y cobertura):
+
+| Sede | HQ | Cobertura |
+| --- | --- | --- |
+| Villavicencio | Cra. 39 #10 51 | Presencial (municipios del Meta) + remoto (departamento) |
+| Bogotá | Cra. 120 #17F-63, Fontibón | Solo ciudad |
+| Cali | Cra. 5 #7 32, COMUNA 3 | Solo ciudad |
+
+- **Ubicación:** JavaScript API con clave, o iframe; el cambio de idioma **no remonta** el mapa (se conserva la sede).
+- **Cobertura:** GeoJSON con `scripts/fetch-coverage.mjs` → `src/data/coverage.json`.
+
+## Catálogo
+
+Cabecera / nav / pie usan `BrochureDownload` con `public/catalogo-rose-technology.pdf` (versionado para el deploy). Sustituye la antigua presentación.
 
 ## Formulario de contacto
 
 El visitante elige un tema (diagnóstico, cotización, Myshop, productos, asesoría, mantenimiento), deja datos y mensaje. El cliente valida y envía `POST /api/contact`. El servidor vuelve a validar, aplica límite de ritmo y, si Resend está configurado:
 
-1. Notifica a todas las direcciones de `LEAD_TO` (o `CEO_EMAIL` de reserva) en un solo envío (HTML escapado).
+1. Notifica a todas las direcciones de `LEAD_TO` (preferido; coma-separadas) o `CEO_EMAIL` de reserva en un solo envío (HTML escapado).
 2. Envía confirmación al visitante (salvo modo de prueba `resend.dev`).
 
 Hay un campo honeypot oculto para bots. Los mensajes de error se renderizan como texto, no como HTML.
 
 ## Marca
 
-Los activos en runtime viven solo en `public/brand/` (bloque de héroe, marcas de cabecera, icono de WhatsApp). Vite los copia a `dist/brand/`. El correo adjunta `logo-mark-red.png` desde disco.
+Los activos en runtime viven solo en `public/brand/` (bloque de héroe, marcas de cabecera, icono de WhatsApp). Vite los copia a `dist/brand/`. El correo adjunta `logo-mark-red.png` desde disco. Marca: **ROSE** / **ROSE Technology** (sin sufijo “S.A.S.”).
 
 ## Producción
 

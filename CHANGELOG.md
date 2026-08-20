@@ -9,13 +9,13 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ### Added
 
-- Repository [ARCHITECTURE.md](./ARCHITECTURE.md).
+- Repository [ARCHITECTURE.md](./ARCHITECTURE.md) (three sedes, `LEAD_TO`, catalog asset, theme boot, Docker/Render).
 - Visual bilingual READMEs (shields, language switcher, no emoji) and this changelog.
 - Shared `bodyLock` helper for nav drawer and brochure modal scroll locking.
 - SVG icons on cards, process steps, products, why-us, team, and coverage sections.
-- Catalog download control in the header / nav (`BrochureDownload`) serving `public/catalogo-rose-technology.pdf` (tracked on GitHub for deploy).
-- Three-sede coverage and location UX: Villavicencio (principal), Bogotá, and Cali, with per-sede maps and OSM-derived polygons.
-- `LEAD_TO` env var (comma-separated lead inboxes); `CEO_EMAIL` kept as fallback.
+- Catalog download (`BrochureDownload`) serving `public/catalogo-rose-technology.pdf` (tracked for deploy).
+- Three-sede coverage and location UX: Villavicencio (Meta presencial + remoto), Bogotá (city-only), Cali (city-only), with HQ pins and OSM-derived polygons.
+- `LEAD_TO` env var (comma-separated lead inboxes); `CEO_EMAIL` kept as fallback. Documented in `.env.example`, `render.yaml`, READMEs, SECURITY.
 
 ### Changed
 
@@ -25,12 +25,13 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 - Branding and copy drop the “S.A.S.” legal suffix; the site presents **ROSE** / **ROSE Technology**.
 - Coverage section layout reworked for sede selection, clearer map/hint pairing, and multi-city on-site areas.
 - Contact lead routing prefers `LEAD_TO` over a single `CEO_EMAIL` inbox.
+- Docs pack (README / README.es / ARCHITECTURE / SECURITY / CHANGELOG / `.env.example` / `render.yaml`) aligned with current product.
 
 ### Fixed
 
 - Theme toggle works more reliably across browsers (including Samsung Internet Force Dark): set `data-theme` and `color-scheme` early via a boot script so light mode is not stuck dark.
 - Brochure modal no longer shows a black bar under the sticky header (portal to `document.body` plus modal-open nav paint).
-- Coverage map polygons stay red and the selected sede location is preserved when switching language.
+- Coverage/location maps keep polygons and the selected sede when switching language (locale change does not remount the map).
 
 ### Removed
 

@@ -18,12 +18,12 @@ Una **aplicación de una sola página** (Vite 7 + React 19 + TypeScript 5.9) má
 | API | Express (`server/index.mjs`): contacto, salud y estáticos `dist/` en producción |
 | Correo | SDK de [Resend](https://resend.com/) solo en el servidor |
 | Mapas | Google Maps JavaScript API, o iframe Embed si falta la clave pública |
-| i18n | Locales JSON + `I18nProvider` (nueve idiomas, español por defecto) |
-| Tema | Claro / oscuro vía `ThemeProvider` |
+| i18n | **Custom** (`I18nProvider` + JSON por idioma). No i18next |
+| Tema | Claro / oscuro vía `ThemeProvider` + script temprano `data-theme` / `color-scheme` |
 | Empaque | Docker multi-etapa (`node:20-alpine`) |
 | Alojamiento | Render, plan **free**, runtime Docker (`render.yaml`) |
 
-**No hay base de datos de aplicación.** Los leads van al correo. Idioma y tema persisten en `localStorage`. Los polígonos de cobertura son GeoJSON versionado.
+**No hay base de datos de aplicación.** Los leads van al correo (`LEAD_TO`, con `CEO_EMAIL` de reserva). Idioma y tema persisten en `localStorage`. Los polígonos de cobertura son GeoJSON versionado.
 
 ```
 Visitante (navegador)
@@ -38,8 +38,8 @@ Visitante (navegador)
 └───────────┬─────────────┘                  │
             │                                ▼
             ▼                         Resend (secreto en Node)
-     Google Maps                      LEAD_TO + visitante
-     (VITE_* en el bundle)
+     Google Maps                      LEAD_TO (+ visitante)
+     (VITE_* en el bundle)            CEO_EMAIL = fallback
 ```
 
 En producción el origen del sitio y el de la API coinciden. El formulario hace `POST` a `/api/contact` en el mismo host.
@@ -50,7 +50,7 @@ En producción el origen del sitio y el de la API coinciden. El formulario hace 
 
 ### Folleto corporativo, no una plataforma
 
-El sitio presenta marca, servicio técnico, **Myshop**, productos y cobertura en el Meta, y convierte al visitante en un correo. No hay cuentas, pagos ni almacén propio de leads. Un SPA estático más un endpoint de correo cubre ese alcance sin migraciones ni un segundo servicio que operar.
+El sitio presenta marca, servicio técnico, **Myshop**, productos y cobertura en **tres sedes** (Villavicencio / Bogotá / Cali), y convierte al visitante en un correo. No hay cuentas, pagos ni almacén propio de leads. Un SPA estático más un endpoint de correo cubre ese alcance sin migraciones ni un segundo servicio que operar.
 
 ### Una sola unidad de despliegue
 
@@ -65,7 +65,7 @@ En local sigue importando la recarga rápida: `npm run dev` levanta API y Vite e
 
 ### Sin base de datos extra
 
-Los leads no se guardan en Postgres ni en un CRM propio: llegan a `LEAD_TO` (o `CEO_EMAIL`) y el visitante recibe confirmación. Una base habría significado copias de seguridad, credenciales, un datastore de pago en Render y más superficie de ataque sin necesidad de negocio en esta fase.
+Los leads no se guardan en Postgres ni en un CRM propio: llegan a `LEAD_TO` (lista separada por coma; preferido) o a `CEO_EMAIL` (fallback) y el visitante recibe confirmación. Una base habría significado copias de seguridad, credenciales, un datastore de pago en Render y más superficie de ataque sin necesidad de negocio en esta fase.
 
 ### Docker y Render (plan free)
 
@@ -81,9 +81,10 @@ La imagen de dos etapas deja compiladores y dependencias de desarrollo fuera del
 | **`POST /api/contact`** | Único flujo de escritura de negocio: validar el lead y enviar correo. |
 | **`GET /api/health`** | Comprobación de vida para Docker/Render. Sin datos personales. |
 | **Resend** | Lead interno a `LEAD_TO` / `CEO_EMAIL` (HTML escapado, logo CID) y confirmación al visitante. |
-| **Google Maps** | Pin de sede (`LocationMap`) y polígonos de cobertura (`CoverageMap` + `src/data/coverage.json`). |
+| **Google Maps** | Tres sedes (`LocationMap`) y cobertura por sede (`CoverageMap` + `src/data/coverage.json`). |
+| **Catálogo** | `public/catalogo-rose-technology.pdf` vía `BrochureDownload` (no presentación antigua). |
 | **i18n** | Nueve JSON de idioma; `lang` del documento; preferencia en `localStorage`. Temas del formulario con ids estables. |
-| **Tema** | Oscuro (predeterminado corporativo) / claro; la primera visita puede seguir `prefers-color-scheme`; mapas y logos siguen el tema. |
+| **Tema** | Oscuro (predeterminado corporativo) / claro; script temprano + `ThemeProvider`; mapas y logos siguen el tema. |
 | **Marca** (`public/brand/`) | Logos de sitio, pie, PDF y adjunto del correo. |
 
 El navegador no habla con Resend. Overpass de OpenStreetMap solo lo usa `scripts/fetch-coverage.mjs` en máquina de desarrollo. Los mapas no piden geolocalización del visitante.
@@ -97,7 +98,7 @@ El navegador no habla con Resend. Overpass de OpenStreetMap solo lo usa `scripts
 - `concurrently` arranca `npm run dev:api` (`node server/index.mjs`) y `npm run dev:web` (`vite`).
 - La API escucha en `127.0.0.1:8787` por defecto (`API_PORT` / `PORT`). `API_HOST` predeterminado: `127.0.0.1`.
 - Vite en el puerto **5173** y proxy de `/api` hacia Express. Si la API está caída, el proxy responde JSON `503`.
-- `public/` (marca, fotos, folleto PDF) lo sirve Vite.
+- `public/` (marca, fotos, **catálogo PDF**) lo sirve Vite.
 - `npm run preview` sirve `dist/` y sigue haciendo proxy de `/api`; el proceso de la API debe estar aparte.
 
 ### Production — `npm start`, Docker, Render
@@ -105,7 +106,7 @@ El navegador no habla con Resend. Overpass de OpenStreetMap solo lo usa `scripts
 - `npm run build` comprueba TypeScript y escribe `dist/`. Todas las `VITE_*` se hornean en este paso.
 - `NODE_ENV=production`: un proceso sirve `dist/` y la API. `API_HOST=0.0.0.0` para que el contenedor acepte tráfico.
 - Render asigna `PORT`. Docker Compose publica **8787**.
-- La imagen final es solo Node Alpine: `npm ci --omit=dev` de producción, `dist/`, `server/` y `public/` (activos de correo). Vite no está en la etapa runner.
+- La imagen final es solo Node Alpine: `npm ci --omit=dev` de producción, `dist/`, `server/` y `public/` (activos de correo y catálogo). Vite no está en la etapa runner.
 - `TRUST_PROXY=1` para que el rate limit vea la IP del visitante detrás del proxy de Render.
 
 Si cambia `VITE_GOOGLE_MAPS_KEY` hay que **reconstruir**: el navegador no la lee del entorno del contenedor en runtime.
@@ -116,15 +117,17 @@ Si cambia `VITE_GOOGLE_MAPS_KEY` hay que **reconstruir**: el navegador no la lee
 
 ```
 src/                    Aplicación React
-src/components/         Header, formularios, mapas, iconos, controles i18n/tema
-src/i18n/               I18nProvider + locales/*.json
-src/theme/              ThemeProvider
-src/data/coverage.json  GeoJSON de cobertura (OSM)
-src/lib/                Carga del script de Google Maps
-server/                 Express + plantillas de correo
-public/                 Favicon, folleto, robots, fotos de servicios
+src/components/         Header, BrochureDownload, formularios, mapas, iconos, controles i18n/tema
+src/content.ts          COMPANY + SEDES (direcciones HQ de las tres sedes)
+src/i18n/               I18nProvider custom + locales/*.json (no i18next)
+src/theme/              ThemeProvider (data-theme + color-scheme)
+src/data/coverage.json  GeoJSON por sede (OSM)
+src/lib/                Carga del script de Google Maps; bodyLock
+server/                 Express + plantillas de correo (LEAD_TO / CEO_EMAIL)
+public/                 Favicon, catálogo PDF, robots, fotos de servicios
+public/catalogo-rose-technology.pdf   Catálogo descargable (GitHub / deploy)
 public/brand/           Kit de marca (Vite lo copia a dist/brand/)
-scripts/                Cobertura OSM
+scripts/                Cobertura OSM (fetch-coverage.mjs)
 Dockerfile              Imagen de producción multi-etapa
 docker-compose.yml      Arranque local tipo producción
 render.yaml             Blueprint de Render (plan free)
@@ -134,9 +137,37 @@ ARCHITECTURE.md         Este archivo (GitHub)
 
 `node_modules/` y `dist/` no se versionan. `package-lock.json` fija versiones. `.env` y `src/.env` están en `.gitignore`.
 
+**Solo local (gitignored):** `docs/*.pdf` y `scripts/generate-docs.mjs` (generador PDF con pdfkit). No forman parte del deploy.
+
 ---
 
-## 6. Infrastructure
+## 6. Tres sedes, mapas y cobertura
+
+Constantes en `src/content.ts` (`SEDES` / `SEDE_ORDER`):
+
+| Sede | HQ | Cobertura en mapa |
+| --- | --- | --- |
+| **Villavicencio** (principal) | Cra. 39 #10 51, Esperanza | Presencial (municipios urbanos del Meta) **y** remoto (departamento) |
+| **Bogotá** | Cra. 120 #17F-63, Fontibón | Solo ciudad (D.C.) |
+| **Cali** | Cra. 5 #7 32, COMUNA 3 | Solo ciudad |
+
+- **`LocationMap`:** selector de sede + pin / iframe por dirección. El cambio de **locale no remonta** el mapa (deps del `useEffect` de init omiten `locale` / strings traducidos) para no perder la sede seleccionada ni resetear el pin.
+- **`CoverageMap`:** recibe la sede activa; Villavicencio muestra toggle presencial/remoto; Bogotá y Cali solo presencial ciudad. Polígonos en `src/data/coverage.json`.
+- Regeneración OSM: `scripts/fetch-coverage.mjs`.
+
+---
+
+## 7. Tema (`data-theme` + `color-scheme`)
+
+Samsung Internet Force Dark y otros navegadores pueden forzar oscuro si `color-scheme` no está alineado antes del primer paint.
+
+1. **Script temprano** en `index.html`: lee `rose-theme` / `prefers-color-scheme`, fija `data-theme`, clases `theme-light` / `theme-dark`, `style.colorScheme` / `color-scheme`, y meta `color-scheme` / `theme-color`.
+2. **`ThemeProvider`:** sincroniza el mismo contrato al toglear; persiste en `localStorage`.
+3. CSS usa `[data-theme="light|dark"]` (y `color-scheme` en `:root`) para variables y controles nativos.
+
+---
+
+## 8. Infrastructure
 
 ### Docker multi-stage
 
@@ -150,13 +181,13 @@ ARCHITECTURE.md         Este archivo (GitHub)
 `render.yaml` declara el servicio web `rose-tech`, runtime Docker, `healthCheckPath: /api/health`, `plan: free`.
 
 Fijos en Git: `NODE_ENV`, `TRUST_PROXY`, `API_HOST`.  
-Solo panel (`sync: false`): `RESEND_API_KEY`, `RESEND_FROM`, `LEAD_TO` (o `CEO_EMAIL`), `VITE_GOOGLE_MAPS_KEY`, `VITE_GOOGLE_MAPS_MAP_ID`, `FRONTEND_ORIGIN`.
+Solo panel (`sync: false`): `RESEND_API_KEY`, `RESEND_FROM`, `LEAD_TO` (preferido), `CEO_EMAIL` (fallback), `VITE_GOOGLE_MAPS_KEY`, `VITE_GOOGLE_MAPS_MAP_ID`, `FRONTEND_ORIGIN`.
 
 Tras el primer despliegue, defina `FRONTEND_ORIGIN` como `https://<servicio>.onrender.com` (sin barra final) y **vuelva a desplegar**.
 
 ### Environment variables (nombres únicamente)
 
-**Servidor:** `RESEND_API_KEY`, `RESEND_FROM`, `LEAD_TO` (o `CEO_EMAIL`), `PORT`, `API_PORT`, `API_HOST`, `FRONTEND_ORIGIN`, `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX`, `TRUST_PROXY`, `NODE_ENV`.
+**Servidor:** `RESEND_API_KEY`, `RESEND_FROM`, `LEAD_TO` (preferido), `CEO_EMAIL` (fallback), `PORT`, `API_PORT`, `API_HOST`, `FRONTEND_ORIGIN`, `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX`, `TRUST_PROXY`, `NODE_ENV`.
 
 **Cliente (públicas a propósito, en el build):** `VITE_GOOGLE_MAPS_KEY`, `VITE_GOOGLE_MAPS_MAP_ID`.
 
@@ -172,7 +203,7 @@ Propósito y comentarios: `.env.example`. Nunca versionar valores reales.
 
 ---
 
-## 7. Data flow — formulario → API → Resend
+## 9. Data flow — formulario → API → Resend
 
 El único camino que mueve datos personales.
 
@@ -181,17 +212,18 @@ El único camino que mueve datos personales.
 3. En local, Vite proxyfica a Express `:8787`. En producción, Express atiende el mismo origen.
 4. Express vuelve a validar, aplica rate limit y mira el honeypot oculto `website`.
 5. Clave de Resend ausente o placeholder → `503`. Honeypot relleno → `200` y **sin** correo.
-6. Resend envía el lead a `LEAD_TO` / `CEO_EMAIL` y, salvo modo de prueba `resend.dev`, una confirmación al visitante.
+6. Resend envía el lead a todas las direcciones de `LEAD_TO` (o `CEO_EMAIL` si falta) y, salvo modo de prueba `resend.dev`, una confirmación al visitante.
 7. La interfaz muestra nodos de texto (no HTML del servidor). Los errores del proveedor se traducen a copy genérico. En production los logs no incluyen PII.
 
 No hay cola, webhook ni tabla de leads. Modelo de amenazas y reporte: [SECURITY.md](./SECURITY.md).
 
 ---
 
-## 8. What this architecture is not
+## 10. What this architecture is not
 
 - No es un CMS: los textos viven en JSON de i18n y en componentes.
 - No es un backend de negocio: no hay autenticación, sesiones ni roles.
 - No es un almacén de datos: el correo es el sistema de registro de leads.
+- No usa i18next: el i18n es un proveedor propio.
 
 Un panel de leads o un blog exigiría un diseño de persistencia nuevo, no una base improvisada dentro de este proceso.

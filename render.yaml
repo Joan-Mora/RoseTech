@@ -1,5 +1,10 @@
 # Blueprint: connect this repo in Render and fill secret values in the dashboard.
 # Do not put real keys in this file.
+#
+# Lead routing: set LEAD_TO (comma-separated inboxes, preferred).
+# CEO_EMAIL is optional fallback if LEAD_TO is empty.
+# After first deploy, set FRONTEND_ORIGIN to https://<service>.onrender.com (no trailing slash) and redeploy.
+# VITE_* Maps vars are build-time: change them → rebuild the Docker image.
 services:
   - type: web
     name: rose-tech

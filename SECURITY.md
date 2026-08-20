@@ -1,6 +1,6 @@
 # Seguridad — ROSE Technology
 
-Documento de referencia para el sitio corporativo y la API de contacto de ROSE No contiene secretos.
+Documento de referencia para el sitio corporativo y la API de contacto de **ROSE**. No contiene secretos.
 
 ## Cómo reportar un problema
 
@@ -15,7 +15,7 @@ Si identifica una vulnerabilidad, **no** abra un issue público con explotacione
 | Activo | Riesgo principal | Mitigación |
 | --- | --- | --- |
 | Clave de Resend | Uso no autorizado y envío masivo de correo | Solo en el servidor, nunca `VITE_*` |
-| Bandeja de leads | Spam, inyección HTML en el correo interno | Validación, honeypot, rate limit, escape HTML |
+| Bandejas de leads (`LEAD_TO`) | Spam, inyección HTML; PII replicada a varias bandejas | Validación, honeypot, rate limit, escape HTML; lista acotada de destinatarios |
 | Clave de Maps | Abuso de cuota de Google | Restricción por HTTP referrer y por API |
 | Sitio estático | XSS, clickjacking, filtrado de referrer | CSP, cabeceras, sin `innerHTML` de usuario |
 | API | CORS abierto, cuerpos enormes, fugas de pila | Allowlist, límite 16 KB, errores genéricos |
@@ -25,6 +25,7 @@ El sitio es informativo. No hay autenticación de clientes, pasarela de pago ni 
 ## Qué está protegido
 
 - **Secretos de servidor:** `RESEND_API_KEY` y el resto de variables sin prefijo `VITE_` viven en `.env` (fuera de Git).
+- **Destinatarios del lead:** `LEAD_TO` (preferido, lista separada por coma) o `CEO_EMAIL` (fallback). Cada envío de lead lleva PII del visitante a **todas** esas bandejas en un solo mensaje Resend; mantenga la lista corta y en el panel de Render (`sync: false`), nunca en Git.
 - **CORS:** solo `localhost` de Vite/preview y los orígenes de `FRONTEND_ORIGIN`.
 - **Producción:** un proceso Node sirve `dist/` y `/api`. En Render/Docker ponga `TRUST_PROXY=1` y `FRONTEND_ORIGIN` a la URL HTTPS del servicio.
 - **Helmet** en Express: CSP restrictiva para respuestas JSON, `X-Content-Type-Options`, política de referrer, sin `X-Powered-By`.
@@ -37,12 +38,13 @@ El sitio es informativo. No hay autenticación de clientes, pasarela de pago ni 
 - **Errores al cliente:** mensajes operativos, **sin** trazas de pila ni detalle de Resend.
 - **Registros:** en `NODE_ENV=production` no se anotan nombres, correos ni mensajes.
 - **Frontend:** CSP y referrer en `index.html`; cabeceras equivalentes en Vite; el formulario pinta errores como texto.
+- **Tema / `color-scheme`:** el script temprano y `ThemeProvider` alinean `data-theme` y `color-scheme` para que Force Dark (p. ej. Samsung Internet) no pinte un tema claro como oscuro de forma inconsistente; no introduce secretos.
 
 ## Qué es público a propósito
 
-- Textos, imágenes y PDFs comerciales del sitio.
+- Textos, imágenes y el **catálogo** PDF (`public/catalogo-rose-technology.pdf`).
 - `VITE_GOOGLE_MAPS_KEY` y `VITE_GOOGLE_MAPS_MAP_ID`: Vite las incrusta en el JavaScript. Eso es el modelo de Google Maps en el navegador. La defensa es **restringir la clave**, no ocultarla.
-- La dirección, teléfono y correo publicados en el pie de página.
+- La dirección, teléfono y correo publicados en el pie de página (tres sedes: Villavicencio, Bogotá, Cali).
 
 ## Google Maps
 
@@ -58,6 +60,7 @@ Si la clave falta o Google la rechaza, el mapa de sede cae al iframe embebido.
 
 - Verifique el dominio del remitente (`RESEND_FROM`) antes de producción.
 - `onboarding@resend.dev` solo entrega a la cuenta de Resend; no sirve como canal real de leads.
+- Configure `LEAD_TO` con las bandejas internas (coma-separadas). `CEO_EMAIL` queda como compatibilidad si `LEAD_TO` está vacío.
 - La API nunca reenvía la clave ni el HTML crudo de error de Resend al navegador.
 
 ## Límite de ritmo y proxy
@@ -79,6 +82,6 @@ Corrija avisos de gravedad alta cuando exista parche compatible. No ejecute `npm
 
 - `.env` y `src/.env` están en `.gitignore`.
 - `.env.example` documenta **nombres** y propósito, no valores secretos.
-- No incruste claves en README, este archivo ni en los PDF de `docs/`.
+- No incruste claves en README, este archivo ni en los PDF locales de `docs/` (gitignored).
 
-Última revisión alineada con el endurecimiento de la API Express y las cabeceras del frontend.
+Última revisión alineada con `LEAD_TO`, tres sedes, catálogo público y endurecimiento de la API Express / cabeceras del frontend.
