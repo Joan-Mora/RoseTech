@@ -19,7 +19,7 @@
 
 # ROSE Technology — Sitio corporativo
 
-Sitio web institucional de **ROSE S.A.S.** (marca comercial **ROSE Technology**), centro de reparación y optimización de sistemas empresariales con sede en Villavicencio, Meta, Colombia.
+Sitio web institucional de **ROSE** (marca comercial **ROSE Technology**), centro de reparación y optimización de sistemas empresariales con sede en Villavicencio, Meta, Colombia.
 
 Presenta la oferta de servicio técnico, el software administrativo **Myshop**, productos tecnológicos, cobertura territorial y un canal de contacto que notifica al equipo por correo.
 
@@ -86,7 +86,8 @@ Definidas en `.env.example`. **No** copie claves reales a README, issues, PDFs n
 | --- | --- |
 | `RESEND_API_KEY` | Clave de la API de Resend. Solo la lee Node. Nunca `VITE_*`. |
 | `RESEND_FROM` | Remitente. En producción use un dominio **verificado** en Resend. |
-| `CEO_EMAIL` | Destinatario interno de cada lead. |
+| `LEAD_TO` | Destinatarios internos del lead (lista separada por coma; preferido). |
+| `CEO_EMAIL` | Reserva si no hay `LEAD_TO` (un correo o lista separada por coma). |
 | `PORT` | Puerto HTTP en producción (Render lo asigna). Predeterminado `8787`. |
 | `API_PORT` | Puerto local de la API si no hay `PORT` (predeterminado `8787`). |
 | `API_HOST` | Interfaz de escucha (`127.0.0.1` en local; `0.0.0.0` en Docker/Render). |
@@ -184,7 +185,7 @@ Claro y oscuro, con detección inicial de `prefers-color-scheme` y persistencia 
 
 El visitante elige un tema (diagnóstico, cotización, Myshop, productos, asesoría, mantenimiento), deja datos y mensaje. El cliente valida y envía `POST /api/contact`. El servidor vuelve a validar, aplica límite de ritmo y, si Resend está configurado:
 
-1. Notifica a `CEO_EMAIL` (lead interno, HTML escapado).
+1. Notifica a todas las direcciones de `LEAD_TO` (o `CEO_EMAIL` de reserva) en un solo envío (HTML escapado).
 2. Envía confirmación al visitante (salvo modo de prueba `resend.dev`).
 
 Hay un campo honeypot oculto para bots. Los mensajes de error se renderizan como texto, no como HTML.
@@ -203,4 +204,4 @@ Los activos en runtime viven solo en `public/brand/` (bloque de héroe, marcas d
 
 ## Licencia
 
-No hay licencia open source publicada. Código y contenidos del sitio: **uso interno de ROSE S.A.S.** salvo pacto distinto.
+No hay licencia open source publicada. Código y contenidos del sitio: **uso interno de ROSE** salvo pacto distinto.

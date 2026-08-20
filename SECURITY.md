@@ -1,6 +1,6 @@
 # Seguridad — ROSE Technology
 
-Documento de referencia para el sitio corporativo y la API de contacto de ROSE S.A.S. No contiene secretos.
+Documento de referencia para el sitio corporativo y la API de contacto de ROSE No contiene secretos.
 
 ## Cómo reportar un problema
 

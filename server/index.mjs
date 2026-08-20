@@ -14,6 +14,7 @@ import {
   confirmCopy,
   leadHtml,
   logoAttachment,
+  parseLeadRecipients,
   visitorHtml,
 } from "./email.mjs";
 
@@ -309,7 +310,14 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
   }
 
   const from = process.env.RESEND_FROM || "ROSE Technology <noreply@abacore.co>";
-  const ceo = process.env.CEO_EMAIL || "darwin@abacore.co";
+  const leadTo = parseLeadRecipients();
+  if (!leadTo.length) {
+    console.error("Contact API: LEAD_TO / CEO_EMAIL is not configured.");
+    return res.status(503).json({
+      error: "El envío de correo no está configurado. Escríbanos por WhatsApp.",
+      field: "mail",
+    });
+  }
   const testingFrom = /@resend\.dev\b/i.test(from);
   const { nombre, email, telefono, tema, temaLabel, mensaje, locale } = parsed.data;
   const temaEs = TOPICS_ES[tema];
@@ -320,9 +328,9 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
   try {
     const ceoResult = await resend.emails.send({
       from,
-      to: ceo,
+      to: leadTo,
       ...(testingFrom ? {} : { replyTo: email }),
-      subject: `Nuevo lead ROSE S.A.S. — ${temaEs}`,
+      subject: `Nuevo lead ROSE Technology — ${temaEs}`,
       html: leadHtml({
         nombre,
         email,

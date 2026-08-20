@@ -29,9 +29,13 @@ declare namespace google.maps {
     data: Data;
     fitBounds(bounds: LatLngBounds, padding?: number): void;
     setOptions(opts: Record<string, unknown>): void;
+    setCenter(latLng: { lat: number; lng: number }): void;
+    panTo(latLng: { lat: number; lng: number }): void;
+    setZoom(zoom: number): void;
   }
   namespace marker {
     class AdvancedMarkerElement {
+      map: Map | null;
       constructor(opts?: Record<string, unknown>);
     }
   }
@@ -40,6 +44,7 @@ declare namespace google.maps {
   }
   class Marker {
     constructor(opts?: Record<string, unknown>);
+    setMap(map: Map | null): void;
   }
   class Size {
     constructor(width: number, height: number);

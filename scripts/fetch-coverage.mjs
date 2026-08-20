@@ -334,10 +334,51 @@ for (const town of URBAN_TOWNS) {
 const features = CITY_ORDER.map((name) => byName.get(name)).filter(Boolean);
 if (features.length !== 7) throw new Error(`Expected 7 city features, got ${features.length}`);
 
+const CITY_POLYS = [
+  {
+    key: "bogota",
+    name: "Bogotá",
+    osm: "R7426387",
+    kind: "ciudad",
+    source: "OSM relation Bogotá (R7426387) Distrito Capital urbano",
+  },
+  {
+    key: "cali",
+    name: "Cali",
+    osm: "R8811628",
+    kind: "ciudad",
+    source: "OSM relation Cali ciudad (R8811628)",
+  },
+];
+
+const cityCollections = {};
+for (const city of CITY_POLYS) {
+  console.log("Fetching", city.name, city.osm);
+  const geometry = await lookup(city.osm);
+  cityCollections[city.key] = {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: {
+          name: city.name,
+          kind: city.kind,
+          source: city.source,
+          osm: city.osm,
+        },
+        geometry,
+      },
+    ],
+  };
+  await sleep(1100);
+}
+
 const payload = {
   presencial: { type: "FeatureCollection", features },
   remoto: existing.remoto,
+  bogota: cityCollections.bogota,
+  cali: cityCollections.cali,
 };
 
 await writeFile(outFile, JSON.stringify(payload));
-console.log("Wrote", outFile, "features", features.length);
+console.log("Wrote", outFile, "features", features.length, "+ bogota + cali");

@@ -28,9 +28,11 @@ extracted/
 pdf-text.txt
 coverage/
 
-# Local-only PDFs. Not published to GitHub.
+# Local-only PDFs / docs toolchain. Not published to GitHub.
 docs/
 scripts/generate-docs.*
+# Duplicate root catalog; the published copy is public/catalogo-rose-technology.pdf.
+ROSE TECHNOLOGY CATALOGO.pdf
 
 .turbo/
 .cache/

@@ -1,6 +1,6 @@
 # Architecture — ROSE Technology
 
-Sitio institucional de **ROSE S.A.S.** (marca comercial **ROSE Technology**). Este documento describe la arquitectura elegida, el motivo de cada pieza y cómo se reparte el sistema en local y en producción.
+Sitio institucional de **ROSE** (marca comercial **ROSE Technology**). Este documento describe la arquitectura elegida, el motivo de cada pieza y cómo se reparte el sistema en local y en producción.
 
 **No hay secretos en este archivo.**
 
@@ -38,7 +38,7 @@ Visitante (navegador)
 └───────────┬─────────────┘                  │
             │                                ▼
             ▼                         Resend (secreto en Node)
-     Google Maps                      CEO_EMAIL + visitante
+     Google Maps                      LEAD_TO + visitante
      (VITE_* en el bundle)
 ```
 
@@ -65,7 +65,7 @@ En local sigue importando la recarga rápida: `npm run dev` levanta API y Vite e
 
 ### Sin base de datos extra
 
-Los leads no se guardan en Postgres ni en un CRM propio: llegan a `CEO_EMAIL` y el visitante recibe confirmación. Una base habría significado copias de seguridad, credenciales, un datastore de pago en Render y más superficie de ataque sin necesidad de negocio en esta fase.
+Los leads no se guardan en Postgres ni en un CRM propio: llegan a `LEAD_TO` (o `CEO_EMAIL`) y el visitante recibe confirmación. Una base habría significado copias de seguridad, credenciales, un datastore de pago en Render y más superficie de ataque sin necesidad de negocio en esta fase.
 
 ### Docker y Render (plan free)
 
@@ -80,7 +80,7 @@ La imagen de dos etapas deja compiladores y dependencias de desarrollo fuera del
 | **Frontend** (`src/`) | Anclas de una página, nav fija y cajón móvil, formularios, mapas, aviso de cookies, JSON-LD `LocalBusiness`. |
 | **`POST /api/contact`** | Único flujo de escritura de negocio: validar el lead y enviar correo. |
 | **`GET /api/health`** | Comprobación de vida para Docker/Render. Sin datos personales. |
-| **Resend** | Lead interno a `CEO_EMAIL` (HTML escapado, logo CID) y confirmación al visitante. |
+| **Resend** | Lead interno a `LEAD_TO` / `CEO_EMAIL` (HTML escapado, logo CID) y confirmación al visitante. |
 | **Google Maps** | Pin de sede (`LocationMap`) y polígonos de cobertura (`CoverageMap` + `src/data/coverage.json`). |
 | **i18n** | Nueve JSON de idioma; `lang` del documento; preferencia en `localStorage`. Temas del formulario con ids estables. |
 | **Tema** | Oscuro (predeterminado corporativo) / claro; la primera visita puede seguir `prefers-color-scheme`; mapas y logos siguen el tema. |
@@ -150,13 +150,13 @@ ARCHITECTURE.md         Este archivo (GitHub)
 `render.yaml` declara el servicio web `rose-tech`, runtime Docker, `healthCheckPath: /api/health`, `plan: free`.
 
 Fijos en Git: `NODE_ENV`, `TRUST_PROXY`, `API_HOST`.  
-Solo panel (`sync: false`): `RESEND_API_KEY`, `RESEND_FROM`, `CEO_EMAIL`, `VITE_GOOGLE_MAPS_KEY`, `VITE_GOOGLE_MAPS_MAP_ID`, `FRONTEND_ORIGIN`.
+Solo panel (`sync: false`): `RESEND_API_KEY`, `RESEND_FROM`, `LEAD_TO` (o `CEO_EMAIL`), `VITE_GOOGLE_MAPS_KEY`, `VITE_GOOGLE_MAPS_MAP_ID`, `FRONTEND_ORIGIN`.
 
 Tras el primer despliegue, defina `FRONTEND_ORIGIN` como `https://<servicio>.onrender.com` (sin barra final) y **vuelva a desplegar**.
 
 ### Environment variables (nombres únicamente)
 
-**Servidor:** `RESEND_API_KEY`, `RESEND_FROM`, `CEO_EMAIL`, `PORT`, `API_PORT`, `API_HOST`, `FRONTEND_ORIGIN`, `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX`, `TRUST_PROXY`, `NODE_ENV`.
+**Servidor:** `RESEND_API_KEY`, `RESEND_FROM`, `LEAD_TO` (o `CEO_EMAIL`), `PORT`, `API_PORT`, `API_HOST`, `FRONTEND_ORIGIN`, `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX`, `TRUST_PROXY`, `NODE_ENV`.
 
 **Cliente (públicas a propósito, en el build):** `VITE_GOOGLE_MAPS_KEY`, `VITE_GOOGLE_MAPS_MAP_ID`.
 
@@ -181,7 +181,7 @@ El único camino que mueve datos personales.
 3. En local, Vite proxyfica a Express `:8787`. En producción, Express atiende el mismo origen.
 4. Express vuelve a validar, aplica rate limit y mira el honeypot oculto `website`.
 5. Clave de Resend ausente o placeholder → `503`. Honeypot relleno → `200` y **sin** correo.
-6. Resend envía el lead a `CEO_EMAIL` y, salvo modo de prueba `resend.dev`, una confirmación al visitante.
+6. Resend envía el lead a `LEAD_TO` / `CEO_EMAIL` y, salvo modo de prueba `resend.dev`, una confirmación al visitante.
 7. La interfaz muestra nodos de texto (no HTML del servidor). Los errores del proveedor se traducen a copy genérico. En production los logs no incluyen PII.
 
 No hay cola, webhook ni tabla de leads. Modelo de amenazas y reporte: [SECURITY.md](./SECURITY.md).

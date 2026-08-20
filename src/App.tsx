@@ -36,7 +36,7 @@ import {
   IconUsers,
   IconWrench,
 } from "./components/ContactIcons";
-import { COMPANY, SERVICE_DEVICE_PHOTOS } from "./content";
+import { COMPANY, SERVICE_DEVICE_PHOTOS, type SedeId } from "./content";
 import { useI18n } from "./i18n/I18nProvider";
 import { useTheme } from "./theme/ThemeProvider";
 
@@ -93,7 +93,9 @@ export default function App() {
   const { m, interpolate } = useI18n();
   const { theme } = useTheme();
   const [cookies, setCookies] = useState(false);
+  const [coverageSede, setCoverageSede] = useState<SedeId>("villavicencio");
   const footerLogo = theme === "light" ? "./brand/logo-hero-mark-red.png" : "./brand/logo-hero-mark-white.png";
+  const coveragePanel = m.coverage.sedes[coverageSede];
 
   useEffect(() => {
     setCookies(localStorage.getItem("rose-cookie") !== "ok");
@@ -396,19 +398,49 @@ export default function App() {
               <p className="lede">{m.coverage.lede}</p>
             </div>
             <div className="grid-2 coverage-layout">
-              <CoverageMap />
-              <div>
-                <h3>{m.coverage.areaTitle}</h3>
-                <p className="lede">{m.coverage.areaLede}</p>
+              <CoverageMap sede={coverageSede} />
+              <div className="coverage-panel">
+                <div className="coverage-toolbar-band">
+                  <div className="coverage-toolbar" role="tablist" aria-label={m.a11y.coverageSede}>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={coverageSede === "villavicencio"}
+                      className={coverageSede === "villavicencio" ? "active" : undefined}
+                      onClick={() => setCoverageSede("villavicencio")}
+                    >
+                      {m.coverage.sedeVillavicencio}
+                    </button>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={coverageSede === "bogota"}
+                      className={coverageSede === "bogota" ? "active" : undefined}
+                      onClick={() => setCoverageSede("bogota")}
+                    >
+                      {m.coverage.sedeBogota}
+                    </button>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={coverageSede === "cali"}
+                      className={coverageSede === "cali" ? "active" : undefined}
+                      onClick={() => setCoverageSede("cali")}
+                    >
+                      {m.coverage.sedeCali}
+                    </button>
+                  </div>
+                </div>
+                <p className="lede">{coveragePanel.areaLede}</p>
                 <ul>
-                  {m.coverage.cities.map((item) => (
+                  {coveragePanel.cities.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
-                <h3 style={{ marginTop: "1.2rem" }}>{m.coverage.onsiteTitle}</h3>
-                <p>{m.coverage.onsiteText}</p>
+                <h3 style={{ marginTop: "1.2rem" }}>{coveragePanel.onsiteTitle}</h3>
+                <p>{coveragePanel.onsiteText}</p>
                 <p className="card callout-dark" style={{ marginTop: "1rem" }}>
-                  {m.coverage.onsiteNote}
+                  {coveragePanel.onsiteNote}
                 </p>
               </div>
             </div>

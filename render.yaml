@@ -19,6 +19,8 @@ services:
         sync: false
       - key: RESEND_FROM
         sync: false
+      - key: LEAD_TO
+        sync: false
       - key: CEO_EMAIL
         sync: false
       - key: VITE_GOOGLE_MAPS_KEY

@@ -886,11 +886,20 @@ header.nav {
   letter-spacing: 0.12em;
 }
 
-.coverage-map {
+.coverage-layout {
+  align-items: start;
+}
+.coverage-map,
+.coverage-panel {
   display: grid;
   gap: 0.75rem;
   min-width: 0;
   max-width: 100%;
+}
+.coverage-toolbar-band {
+  display: flex;
+  align-items: center;
+  min-height: 3.15rem;
 }
 .coverage-toolbar {
   display: inline-flex;
@@ -902,6 +911,35 @@ header.nav {
   background: rgba(255, 255, 255, 0.03);
   width: fit-content;
   max-width: 100%;
+}
+.coverage-toolbar-mode {
+  border-radius: 12px;
+}
+.coverage-mode-label {
+  margin: 0;
+  font-weight: 700;
+  color: var(--soft);
+  font-size: 0.9rem;
+}
+.location-map {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  max-width: 100%;
+}
+.location-address {
+  margin: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+.location-address strong {
+  font-size: 1rem;
+}
+.location-address span {
+  color: var(--text);
+}
+.location-address small {
+  color: var(--muted);
 }
 .coverage-toolbar button {
   border: 0;

@@ -19,7 +19,7 @@
 
 # ROSE Technology — corporate site
 
-Institutional website for **ROSE S.A.S.** (trade name **ROSE Technology**), a business systems repair and optimization center in Villavicencio, Meta, Colombia.
+Institutional website for **ROSE** (trade name **ROSE Technology**), a business systems repair and optimization center in Villavicencio, Meta, Colombia.
 
 The site presents technical service, the **Myshop** admin product, hardware, territorial coverage, and a contact channel that emails the team.
 
@@ -86,7 +86,8 @@ Names and purpose live in `.env.example`. **Never** copy real keys into README, 
 | --- | --- |
 | `RESEND_API_KEY` | Resend API key. Node only. Never `VITE_*`. |
 | `RESEND_FROM` | Sender. In production use a domain **verified** in Resend. |
-| `CEO_EMAIL` | Internal inbox for each lead. |
+| `LEAD_TO` | Comma-separated internal inboxes for each lead (preferred). |
+| `CEO_EMAIL` | Fallback if `LEAD_TO` is unset (single address or comma-separated list). |
 | `PORT` | HTTP port in production (Render sets this). Default `8787`. |
 | `API_PORT` | Local API port if `PORT` is unset (default `8787`). |
 | `API_HOST` | Bind address (`127.0.0.1` locally; `0.0.0.0` in Docker/Render). |
@@ -184,7 +185,7 @@ Light and dark, with initial `prefers-color-scheme` and persistence in `localSto
 
 The visitor picks a topic (diagnosis, quote, Myshop, products, advisory, maintenance), leaves details, and a message. The client validates and sends `POST /api/contact`. The server validates again, rate-limits, and if Resend is configured:
 
-1. Notifies `CEO_EMAIL` (internal lead, escaped HTML).
+1. Notifies every address in `LEAD_TO` (or `CEO_EMAIL` fallback) in one send (escaped HTML).
 2. Sends a confirmation to the visitor (except `resend.dev` test mode).
 
 A hidden honeypot field catches bots. Error messages are rendered as text, not HTML.
@@ -203,4 +204,4 @@ Runtime assets live only in `public/brand/` (hero block, header marks, WhatsApp 
 
 ## License
 
-No public open-source license is published. Site code and content are for **internal use by ROSE S.A.S.** unless otherwise agreed.
+No public open-source license is published. Site code and content are for **internal use by ROSE** unless otherwise agreed.

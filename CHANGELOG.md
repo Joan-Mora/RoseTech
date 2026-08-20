@@ -13,20 +13,30 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 - Visual bilingual READMEs (shields, language switcher, no emoji) and this changelog.
 - Shared `bodyLock` helper for nav drawer and brochure modal scroll locking.
 - SVG icons on cards, process steps, products, why-us, team, and coverage sections.
+- Catalog download control in the header / nav (`BrochureDownload`) serving `public/catalogo-rose-technology.pdf` (tracked on GitHub for deploy).
+- Three-sede coverage and location UX: Villavicencio (principal), Bogotá, and Cali, with per-sede maps and OSM-derived polygons.
+- `LEAD_TO` env var (comma-separated lead inboxes); `CEO_EMAIL` kept as fallback.
 
 ### Changed
 
 - Mobile navigation lock is scoped to the hamburger breakpoint so desktop layout is not stuck after resize.
 - Sections 3/4 alternate light and stronger dark banding for clearer visual rhythm.
 - Sticky nav red-pill scroll-spy syncs with click navigation (smooth scroll + brief spy ignore).
+- Branding and copy drop the “S.A.S.” legal suffix; the site presents **ROSE** / **ROSE Technology**.
+- Coverage section layout reworked for sede selection, clearer map/hint pairing, and multi-city on-site areas.
+- Contact lead routing prefers `LEAD_TO` over a single `CEO_EMAIL` inbox.
 
 ### Fixed
 
 - Brochure modal no longer shows a black bar under the sticky header (portal to `document.body` plus modal-open nav paint).
 
+### Removed
+
+- Tracked `public/presentacion-rose-sas.pdf` (old S.A.S. presentation); catalog PDF is the downloadable asset.
+
 ## [1.0.0] — 2026-08-19
 
-First production-shaped delivery of the institutional site for **ROSE S.A.S.** (trade name **ROSE Technology**), Villavicencio, Meta.
+First production-shaped delivery of the institutional site for **ROSE** (trade name **ROSE Technology**), Villavicencio, Meta.
 
 ### Added
 

@@ -136,7 +136,7 @@ export default function Header() {
     <a className="brand" href="#inicio" onClick={goTo("#inicio")}>
       <img src={mark} alt={m.hero.logoAlt} width={48} height={58} />
       <span>
-        <strong>ROSE S.A.S.</strong>
+        <strong>ROSE</strong>
         <small>{COMPANY.city}</small>
       </span>
     </a>

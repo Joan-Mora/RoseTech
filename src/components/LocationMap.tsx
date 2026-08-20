@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { COMPANY } from "../content";
+import { COMPANY, SEDES, SEDE_ORDER, type SedeId } from "../content";
 import { useI18n } from "../i18n/I18nProvider";
 import { useTheme } from "../theme/ThemeProvider";
 import {
@@ -13,14 +13,12 @@ import {
 const mapsKey = import.meta.env.VITE_GOOGLE_MAPS_KEY ?? "";
 const customMapId = (import.meta.env.VITE_GOOGLE_MAPS_MAP_ID ?? "").trim();
 
-/** Cra. 39 #10-51, La Esperanza, Villavicencio. */
-export const HQ = { lat: 4.1284, lng: -73.63188 };
-
 function placePin(
   map: google.maps.Map,
+  position: { lat: number; lng: number },
   title: string,
   useAdvanced: boolean,
-): void {
+): google.maps.Marker | google.maps.marker.AdvancedMarkerElement {
   const iconUrl = assetUrl("brand/logo-mark-red.png");
   if (useAdvanced && google.maps.marker?.AdvancedMarkerElement) {
     const glyph = document.createElement("img");
@@ -29,17 +27,16 @@ function placePin(
     glyph.width = 48;
     glyph.height = 58;
     glyph.style.display = "block";
-    new google.maps.marker.AdvancedMarkerElement({
+    return new google.maps.marker.AdvancedMarkerElement({
       map,
-      position: HQ,
+      position,
       title,
       content: glyph,
     });
-    return;
   }
-  new google.maps.Marker({
+  return new google.maps.Marker({
     map,
-    position: HQ,
+    position,
     title,
     icon: {
       url: iconUrl,
@@ -49,22 +46,32 @@ function placePin(
   });
 }
 
+function sedeLabel(m: ReturnType<typeof useI18n>["m"], id: SedeId): string {
+  if (id === "bogota") return m.coverage.sedeBogota;
+  if (id === "cali") return m.coverage.sedeCali;
+  return m.coverage.sedeVillavicencio;
+}
+
 export default function LocationMap() {
   const host = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | google.maps.marker.AdvancedMarkerElement | null>(null);
+  const advancedRef = useRef(false);
   const { theme } = useTheme();
   const { m, interpolate, locale } = useI18n();
+  const [sede, setSede] = useState<SedeId>("villavicencio");
   const [status, setStatus] = useState<"loading" | "ready" | "error" | "nokey">(
     mapsKey ? "loading" : "nokey",
   );
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
 
+  const place = SEDES[sede];
   const iframeSrc = mapsKey
-    ? `https://www.google.com/maps/embed/v1/place?key=${mapsKey}&q=${encodeURIComponent(COMPANY.mapsQuery)}&zoom=16&language=${locale.split("-")[0]}`
-    : COMPANY.mapsEmbed;
-  const title = interpolate(m.map.iframeTitle, { name: COMPANY.tradeName, address: COMPANY.address });
-  const aria = interpolate(m.map.aria, { name: COMPANY.tradeName, address: COMPANY.address });
+    ? `https://www.google.com/maps/embed/v1/place?key=${mapsKey}&q=${encodeURIComponent(place.mapsQuery)}&zoom=16&language=${locale.split("-")[0]}`
+    : place.mapsEmbed;
+  const title = interpolate(m.map.iframeTitle, { name: COMPANY.tradeName, address: place.address });
+  const aria = interpolate(m.map.aria, { name: COMPANY.tradeName, address: place.address });
 
   useEffect(() => {
     if (!mapsKey) {
@@ -77,6 +84,7 @@ export default function LocationMap() {
     const unauth = onMapsAuthFailure(() => {
       if (cancelled) return;
       mapRef.current = null;
+      markerRef.current = null;
       setError(m.map.errorHint);
       setStatus("error");
     });
@@ -86,10 +94,11 @@ export default function LocationMap() {
         if (cancelled || !host.current) return;
         host.current.innerHTML = "";
 
+        const start = SEDES.villavicencio;
         const baseOpts = {
-          center: HQ,
+          center: { lat: start.lat, lng: start.lng },
           zoom: 16,
-          minZoom: 12,
+          minZoom: 10,
           maxZoom: 20,
           mapTypeControl: false,
           streetViewControl: false,
@@ -121,20 +130,33 @@ export default function LocationMap() {
 
         if (cancelled) return;
         mapRef.current = map;
+        advancedRef.current = advanced;
         try {
-          placePin(map, `${COMPANY.tradeName} — ${COMPANY.address}`, advanced);
+          markerRef.current = placePin(
+            map,
+            { lat: start.lat, lng: start.lng },
+            `${COMPANY.tradeName} — ${start.address}`,
+            advanced,
+          );
         } catch {
-          placePin(map, `${COMPANY.tradeName} — ${COMPANY.address}`, false);
+          advancedRef.current = false;
+          markerRef.current = placePin(
+            map,
+            { lat: start.lat, lng: start.lng },
+            `${COMPANY.tradeName} — ${start.address}`,
+            false,
+          );
         }
         google.maps.event.addListenerOnce(map, "idle", () => {
           google.maps.event.trigger(map, "resize");
-          map.setOptions({ center: HQ });
+          map.setOptions({ center: { lat: start.lat, lng: start.lng } });
         });
         setStatus("ready");
       })
       .catch((err: unknown) => {
         if (cancelled) return;
         mapRef.current = null;
+        markerRef.current = null;
         setError(err instanceof Error ? err.message : m.map.errorTitle);
         setStatus("error");
       });
@@ -143,6 +165,7 @@ export default function LocationMap() {
       cancelled = true;
       unauth();
       mapRef.current = null;
+      markerRef.current = null;
       if (host.current) host.current.innerHTML = "";
     };
   }, [retry, mapsKey, locale, m.map.errorHint, m.map.errorTitle]);
@@ -157,8 +180,34 @@ export default function LocationMap() {
     });
   }, [theme, status]);
 
-  if (status === "error" || status === "nokey") {
-    return (
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || status !== "ready") return;
+    const next = SEDES[sede];
+    const pos = { lat: next.lat, lng: next.lng };
+    const pinTitle = `${COMPANY.tradeName} — ${next.address}`;
+
+    const prev = markerRef.current;
+    if (prev) {
+      if (prev instanceof google.maps.Marker) {
+        prev.setMap(null);
+      } else {
+        (prev as google.maps.marker.AdvancedMarkerElement).map = null;
+      }
+      markerRef.current = null;
+    }
+
+    try {
+      markerRef.current = placePin(map, pos, pinTitle, advancedRef.current);
+    } catch {
+      markerRef.current = placePin(map, pos, pinTitle, false);
+    }
+    map.setCenter(pos);
+    map.setOptions({ zoom: 16 });
+  }, [sede, status]);
+
+  const mapBody =
+    status === "error" || status === "nokey" ? (
       <div className="map-shell">
         {status === "error" ? (
           <div className="map-error" role="alert">
@@ -178,13 +227,35 @@ export default function LocationMap() {
           allowFullScreen
         />
       </div>
+    ) : (
+      <div className="map-shell">
+        {status === "loading" ? <p className="map-loading">{m.map.loading}</p> : null}
+        <div className="map-frame" ref={host} role="img" aria-label={aria} />
+      </div>
     );
-  }
 
   return (
-    <div className="map-shell">
-      {status === "loading" ? <p className="map-loading">{m.map.loading}</p> : null}
-      <div className="map-frame" ref={host} role="img" aria-label={aria} />
+    <div className="location-map">
+      <div className="coverage-toolbar" role="tablist" aria-label={m.a11y.locationSede}>
+        {SEDE_ORDER.map((id) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={sede === id}
+            className={sede === id ? "active" : undefined}
+            onClick={() => setSede(id)}
+          >
+            {sedeLabel(m, id)}
+          </button>
+        ))}
+      </div>
+      <p className="location-address">
+        <strong>{sedeLabel(m, sede)}</strong>
+        <span>{place.address}</span>
+        <small>{place.locationLabel}</small>
+      </p>
+      {mapBody}
     </div>
   );
 }

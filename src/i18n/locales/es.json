@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "ROSE Technology | ROSE S.A.S.",
-    "description": "ROSE S.A.S. — Centro de Reparación y Optimización de Sistemas Empresariales. Soluciones tecnológicas integrales, Myshop, reparación y productos para empresas y pymes en Villavicencio, Meta."
+    "title": "ROSE Technology",
+    "description": "ROSE Technology — Centro de Reparación y Optimización de Sistemas Empresariales. Soluciones tecnológicas integrales, Myshop, reparación y productos para empresas y pymes en Villavicencio, Meta."
   },
   "a11y": {
     "skip": "Saltar al contenido",
@@ -16,7 +16,9 @@
     "coverageType": "Tipo de cobertura",
     "coverageMap": "Mapa de área de cobertura",
     "helpTopics": "Temas de ayuda",
-    "whatsapp": "WhatsApp"
+    "whatsapp": "WhatsApp",
+    "coverageSede": "Sede de cobertura",
+    "locationSede": "Sede en el mapa"
   },
   "nav": {
     "home": "Inicio",
@@ -28,8 +30,8 @@
     "team": "Equipo",
     "coverage": "Cobertura",
     "contact": "Contacto",
-    "brochure": "Presentación",
-    "brochureLong": "Descargar presentación",
+    "brochure": "Catálogo",
+    "brochureLong": "Descargar catálogo",
     "contactCta": "Contactar"
   },
   "hero": {
@@ -37,7 +39,7 @@
     "lede": "Soluciones tecnológicas integrales para empresas y pymes en Villavicencio, Meta. Más de 5 años de experiencia, personal altamente capacitado y un compromiso inquebrantable con la calidad y la satisfacción de nuestros clientes.",
     "ctaDiagnose": "Solicitar diagnóstico",
     "ctaMyshop": "Conocer Myshop",
-    "ctaBrochure": "Descargar presentación",
+    "ctaBrochure": "Descargar catálogo",
     "statYears": "+5 años",
     "statYearsLabel": "Experiencia regional",
     "statHours": "24 h",
@@ -52,7 +54,7 @@
   "about": {
     "eyebrow": "01 · Quiénes somos",
     "title": "Tecnología como aliado estratégico, no como problema.",
-    "lede": "ROSE S.A.S. es un proveedor colombiano de soluciones tecnológicas con sede en Villavicencio, Meta. Nos especializamos en reparación, optimización e implementación de sistemas, y en desarrollo de software para empresas, pymes y particulares. Atendemos reparaciones urgentes, mantenimiento preventivo programado, sistemas administrativos y cámaras de seguridad.",
+    "lede": "ROSE es un proveedor colombiano de soluciones tecnológicas con sede en Villavicencio, Meta. Nos especializamos en reparación, optimización e implementación de sistemas, y en desarrollo de software para empresas, pymes y particulares. Atendemos reparaciones urgentes, mantenimiento preventivo programado, sistemas administrativos y cámaras de seguridad.",
     "missionTitle": "Misión",
     "mission": "Brindar soluciones tecnológicas integrales de reparación, mantenimiento y desarrollo de software a empresas y pymes de Villavicencio y el Meta, con personal altamente capacitado, garantizando calidad, confianza y optimización de los sistemas empresariales de nuestros clientes.",
     "visionTitle": "Visión",
@@ -78,7 +80,7 @@
   },
   "services": {
     "eyebrow": "02 · Reparación y mantenimiento",
-    "title": "El corazón de ROSE S.A.S. es el servicio técnico.",
+    "title": "El corazón de ROSE es el servicio técnico.",
     "lede": "Cuando un equipo falla, su empresa pierde productividad, tiempo y dinero. Por eso ofrecemos reparación y mantenimiento rápido, confiable y con garantía, cubriendo una amplia gama de dispositivos electrónicos esenciales para el día a día de cualquier negocio moderno.",
     "lede2": "Desde el primer contacto activamos un protocolo de diagnóstico inicial, presupuesto transparente, reparación con repuestos de calidad y pruebas exhaustivas antes de la entrega. Cada equipo que sale de nuestro taller pasa por un control de calidad riguroso. Trabajamos con todas las marcas y modelos, desde fallas simples hasta problemas complejos de hardware y software, con planes preventivos y correctivos para todo el año.",
     "devices": [
@@ -121,7 +123,7 @@
   "software": {
     "eyebrow": "03 · Desarrollo de software",
     "title": "Plataformas administrativas que transforman la operación.",
-    "lede": "ROSE S.A.S. no se limita a reparar equipos: transformamos la forma en que las empresas gestionan su operación interna. Nuestro equipo de desarrolladores construye sistemas a la medida y la plataforma estrella Myshop — Servicio Electrónico Administrativo, un sistema integral para que las pymes digitalicen su gestión diaria.",
+    "lede": "ROSE no se limita a reparar equipos: transformamos la forma en que las empresas gestionan su operación interna. Nuestro equipo de desarrolladores construye sistemas a la medida y la plataforma estrella Myshop — Servicio Electrónico Administrativo, un sistema integral para que las pymes digitalicen su gestión diaria.",
     "myshopTitle": "Myshop — Servicio Electrónico Administrativo",
     "myshopIntro": "Plataforma integral para la gestión empresarial que incluye:",
     "myshopItems": [
@@ -148,10 +150,22 @@
     ],
     "customCta": "Solicite una demostración gratuita de Myshop o una cotización para su sistema personalizado",
     "steps": [
-      { "code": "01 ANÁLISIS", "text": "Comprender las necesidades del cliente." },
-      { "code": "02 DISEÑO", "text": "Diseñar la solución técnica a medida." },
-      { "code": "03 DESARROLLO", "text": "Construir el sistema y sus módulos." },
-      { "code": "04 IMPLEMENTACIÓN", "text": "Desplegar y capacitar al equipo." }
+      {
+        "code": "01 ANÁLISIS",
+        "text": "Comprender las necesidades del cliente."
+      },
+      {
+        "code": "02 DISEÑO",
+        "text": "Diseñar la solución técnica a medida."
+      },
+      {
+        "code": "03 DESARROLLO",
+        "text": "Construir el sistema y sus módulos."
+      },
+      {
+        "code": "04 IMPLEMENTACIÓN",
+        "text": "Desplegar y capacitar al equipo."
+      }
     ],
     "process": "Nuestro proceso sigue una metodología clara y estructurada. Cada fase involucra al cliente, valida avances y asegura que el producto final supere sus expectativas."
   },
@@ -189,26 +203,50 @@
   },
   "why": {
     "eyebrow": "05 · Por qué elegirnos",
-    "title": "¿Por qué elegir ROSE S.A.S.?",
+    "title": "¿Por qué elegir ROSE?",
     "lede": "En un mercado con múltiples opciones, nos distinguimos por experiencia, compromiso y calidad. No somos solo un taller: somos un socio estratégico para el crecimiento tecnológico de su empresa. Durante más de cinco años hemos priorizado transparencia, eficiencia y resultados tangibles.",
     "lede2": "Conocemos las necesidades de las pymes y empresas de Villavicencio y el Meta. Desde la rapidez ante una falla crítica hasta la asesoría para elegir tecnología, cada interacción está pensada para agregar valor. Un portafolio integral — reparación, mantenimiento, desarrollo de software y venta de productos — le permite un solo interlocutor confiable y reduce costos de coordinación.",
     "stats": [
-      { "value": "+5 años", "text": "Sirviendo a empresas y particulares en Villavicencio y el Meta con excelencia técnica." },
-      { "value": "100%", "text": "Compromiso de calidad: cada trabajo se revisa y garantiza antes de la entrega." },
-      { "value": "24 h", "text": "Respuesta rápida, priorizando casos urgentes para minimizar el impacto operativo." },
-      { "value": "360°", "text": "Servicio integral: reparación, software y productos en un solo lugar." }
+      {
+        "value": "+5 años",
+        "text": "Sirviendo a empresas y particulares en Villavicencio y el Meta con excelencia técnica."
+      },
+      {
+        "value": "100%",
+        "text": "Compromiso de calidad: cada trabajo se revisa y garantiza antes de la entrega."
+      },
+      {
+        "value": "24 h",
+        "text": "Respuesta rápida, priorizando casos urgentes para minimizar el impacto operativo."
+      },
+      {
+        "value": "360°",
+        "text": "Servicio integral: reparación, software y productos en un solo lugar."
+      }
     ],
     "cards": [
-      { "title": "Transparencia total", "text": "Diagnóstico claro y presupuesto detallado antes de cualquier trabajo. Usted decide con plena información." },
-      { "title": "Garantía en todos los servicios", "text": "Reparaciones y productos con garantía escrita. Si algo no funciona como debe, lo resolvemos sin costo adicional." },
-      { "title": "Asesoría personalizada", "text": "No vendemos por vender. Le ayudamos a decidir con base en su presupuesto y objetivos." },
-      { "title": "Actualización continua", "text": "El personal se capacita en las últimas tecnologías, tendencias y metodologías del sector." }
+      {
+        "title": "Transparencia total",
+        "text": "Diagnóstico claro y presupuesto detallado antes de cualquier trabajo. Usted decide con plena información."
+      },
+      {
+        "title": "Garantía en todos los servicios",
+        "text": "Reparaciones y productos con garantía escrita. Si algo no funciona como debe, lo resolvemos sin costo adicional."
+      },
+      {
+        "title": "Asesoría personalizada",
+        "text": "No vendemos por vender. Le ayudamos a decidir con base en su presupuesto y objetivos."
+      },
+      {
+        "title": "Actualización continua",
+        "text": "El personal se capacita en las últimas tecnologías, tendencias y metodologías del sector."
+      }
     ]
   },
   "team": {
     "eyebrow": "Equipo",
     "title": "Nuestro equipo de trabajo",
-    "lede": "El activo más valioso de ROSE S.A.S. es su gente: profesionales altamente capacitados en distintas especialidades, con formación técnica certificada y experiencia comprobada. Actualizamos conocimientos de forma continua y aplicamos un proceso riguroso de selección y formación interna antes de atender a un cliente.",
+    "lede": "El activo más valioso de ROSE es su gente: profesionales altamente capacitados en distintas especialidades, con formación técnica certificada y experiencia comprobada. Actualizamos conocimientos de forma continua y aplicamos un proceso riguroso de selección y formación interna antes de atender a un cliente.",
     "techTitle": "Técnicos especializados",
     "techText": "Reparación de hardware y sistemas electrónicos: computadores, dispositivos móviles, impresoras y seguridad.",
     "techItems": [
@@ -226,43 +264,93 @@
       "Soporte y mantenimiento post-implementación"
     ],
     "cards": [
-      { "title": "Formación certificada", "text": "Todo el personal cuenta con certificaciones técnicas reconocidas y programas periódicos de actualización." },
-      { "title": "Trabajo en equipo", "text": "Coordinamos especialidades para proyectos que requieren una solución integral." },
-      { "title": "Atención al cliente", "text": "Formación para una experiencia positiva desde el primer contacto hasta la entrega final." },
-      { "title": "Confidencialidad", "text": "Todos los colaboradores firman acuerdos de confidencialidad para proteger la información y los datos de su empresa." }
+      {
+        "title": "Formación certificada",
+        "text": "Todo el personal cuenta con certificaciones técnicas reconocidas y programas periódicos de actualización."
+      },
+      {
+        "title": "Trabajo en equipo",
+        "text": "Coordinamos especialidades para proyectos que requieren una solución integral."
+      },
+      {
+        "title": "Atención al cliente",
+        "text": "Formación para una experiencia positiva desde el primer contacto hasta la entrega final."
+      },
+      {
+        "title": "Confidencialidad",
+        "text": "Todos los colaboradores firman acuerdos de confidencialidad para proteger la información y los datos de su empresa."
+      }
     ]
   },
   "coverage": {
     "eyebrow": "Presencia",
-    "title": "Presencia y cobertura en el Meta",
-    "lede": "ROSE S.A.S. tiene su sede principal en Villavicencio, capital del departamento del Meta. Nuestra ubicación estratégica nos permite acompañar el crecimiento empresarial de la región y atender municipios cercanos. El Meta está en pleno desarrollo: nacimos para cubrir esa necesidad y hoy somos un referente tecnológico local, atentos a sus desafíos y oportunidades.",
-    "areaTitle": "Área de cobertura",
-    "areaLede": "Servicio en sitio para empresas con flotas de equipos y soporte remoto para software y configuraciones.",
-    "cities": [
-      "Villavicencio (sede principal)",
-      "Acacías, Restrepo y Cumaral",
-      "Granada, San Martín y Puerto López",
-      "Atención remota para todo el Meta"
-    ],
-    "onsiteTitle": "Servicio a domicilio empresarial",
-    "onsiteText": "Los técnicos se desplazan a las instalaciones del cliente para diagnóstico, reparación y mantenimiento, evitando interrumpir la operación.",
-    "onsiteNote": "Consulte disponibilidad para su zona. En el área urbana de Villavicencio no hay costo adicional de desplazamiento para empresas con contrato de mantenimiento.",
-    "audiences": [
-      { "title": "Empresas y pymes", "text": "Soluciones escalables, desde una sola oficina hasta múltiples sedes." },
-      { "title": "Particulares", "text": "Atención personalizada para hogares y profesionales independientes que necesitan soporte confiable." },
-      { "title": "Instituciones", "text": "Planes especiales para colegios, universidades y entidades con gran volumen de equipos." }
-    ],
+    "title": "Presencia y cobertura",
+    "lede": "ROSE tiene sedes en Villavicencio (principal), Bogotá y Cali. Cada sede atiende su zona con servicio técnico presencial; en el Meta también ofrecemos soporte remoto en todo el departamento.",
+    "sedeVillavicencio": "Villavicencio",
+    "sedeBogota": "Bogotá",
+    "sedeCali": "Cali",
     "presencial": "Presencial",
     "remoto": "Remoto",
+    "presencialCity": "Presencial (toda la ciudad)",
     "hintOnsite": "Cobertura en sitio por municipio, con polígonos OSM independientes (sin unirlos): perímetros urbanos de Villavicencio (sede), Puerto López, Acacías, Restrepo, Cumaral, Granada y San Martín.",
     "hintRemote": "Cobertura remota en todo el departamento del Meta.",
+    "hintBogota": "La sede Bogotá atiende únicamente la ciudad de Bogotá (Distrito Capital). El mapa muestra el perímetro urbano de toda la ciudad.",
+    "hintCali": "La sede Cali atiende únicamente la ciudad de Cali. El mapa muestra el perímetro urbano de toda la ciudad.",
     "legendRemote": "Departamento del Meta",
+    "legendBogota": "Bogotá (toda la ciudad)",
+    "legendCali": "Cali (toda la ciudad)",
     "iframeOnsite": "Mapa de cobertura presencial",
     "iframeRemote": "Mapa del departamento del Meta",
     "errorTitle": "No se pudo cargar el mapa de cobertura",
     "errorHint": "Verifique la clave de Maps y que Maps JavaScript API esté habilitada. Puede usar el mapa embebido o contactarnos por WhatsApp.",
     "retry": "Reintentar",
-    "loading": "Cargando mapa…"
+    "loading": "Cargando mapa…",
+    "sedes": {
+      "villavicencio": {
+        "areaLede": "Servicio en sitio para empresas con flotas de equipos y soporte remoto para software y configuraciones en el Meta.",
+        "cities": [
+          "Villavicencio (sede principal)",
+          "Acacías, Restrepo y Cumaral",
+          "Granada, San Martín y Puerto López",
+          "Atención remota para todo el Meta"
+        ],
+        "onsiteTitle": "Servicio a domicilio empresarial",
+        "onsiteText": "Los técnicos se desplazan a las instalaciones del cliente para diagnóstico, reparación y mantenimiento, evitando interrumpir la operación.",
+        "onsiteNote": "Consulte disponibilidad para su zona. En el área urbana de Villavicencio no hay costo adicional de desplazamiento para empresas con contrato de mantenimiento."
+      },
+      "bogota": {
+        "areaLede": "La sede Bogotá presta servicio presencial en toda la ciudad de Bogotá. No incluye municipios aledaños de Cundinamarca.",
+        "cities": [
+          "Bogotá, D.C. (toda la ciudad)"
+        ],
+        "onsiteTitle": "Servicio a domicilio en Bogotá",
+        "onsiteText": "Atención técnica en sitio en cualquier zona de Bogotá para diagnóstico, reparación y mantenimiento empresarial.",
+        "onsiteNote": "Cobertura limitada a Bogotá. Consulte disponibilidad y tiempos de desplazamiento según la localidad."
+      },
+      "cali": {
+        "areaLede": "La sede Cali presta servicio presencial en toda la ciudad de Cali. No incluye municipios vecinos del Valle del Cauca.",
+        "cities": [
+          "Cali (toda la ciudad)"
+        ],
+        "onsiteTitle": "Servicio a domicilio en Cali",
+        "onsiteText": "Atención técnica en sitio en cualquier zona de Cali para diagnóstico, reparación y mantenimiento empresarial.",
+        "onsiteNote": "Cobertura limitada a Cali. Consulte disponibilidad y tiempos de desplazamiento según la comuna."
+      }
+    },
+    "audiences": [
+      {
+        "title": "Empresas y pymes",
+        "text": "Soluciones escalables, desde una sola oficina hasta múltiples sedes."
+      },
+      {
+        "title": "Particulares",
+        "text": "Atención personalizada para hogares y profesionales independientes que necesitan soporte confiable."
+      },
+      {
+        "title": "Instituciones",
+        "text": "Planes especiales para colegios, universidades y entidades con gran volumen de equipos."
+      }
+    ]
   },
   "contact": {
     "eyebrow": "06 · Contacto y ubicación",
@@ -317,15 +405,15 @@
     "closer": "Tecnología que impulsa su negocio.",
     "contact": "Contacto",
     "resources": "Recursos",
-    "pdf": "Presentación PDF",
+    "pdf": "Catálogo PDF",
     "coverage": "Cobertura",
     "top": "Volver al inicio",
     "rights": "© {year} {legal}. Todos los derechos reservados.",
     "cookiesNote": "Sitio informativo. No utilizamos cookies de publicidad."
   },
   "brochureGate": {
-    "title": "Presentación solo en español",
-    "body": "La presentación comercial de ROSE S.A.S. está disponible únicamente en español. Puede cancelar o descargarla de todos modos.",
+    "title": "Catálogo solo en español",
+    "body": "El catálogo de productos de ROSE está disponible únicamente en español. Puede cancelar o descargarlo de todos modos.",
     "cancel": "Cancelar",
     "confirm": "Descargar de todos modos"
   },
