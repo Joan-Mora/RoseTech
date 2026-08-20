@@ -29,6 +29,7 @@ and versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 ### Fixed
 
 - Brochure modal no longer shows a black bar under the sticky header (portal to `document.body` plus modal-open nav paint).
+- Coverage map polygons stay red and the selected sede location is preserved when switching language.
 
 ### Removed
 

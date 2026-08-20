@@ -13,10 +13,14 @@ type CoverageFC = {
 
 const mapsKey = import.meta.env.VITE_GOOGLE_MAPS_KEY ?? "";
 
+const BRAND_RED = "#e10600";
+const BRAND_RED_HOT = "#ff1a12";
+const BRAND_STROKE = "#ffd4cf";
+
 const FILL: Record<Mode | "city", string> = {
-  presencial: "#e10600",
+  presencial: BRAND_RED,
   remoto: "#c45a1a",
-  city: "#e10600",
+  city: BRAND_RED,
 };
 
 const META_CITIES = [
@@ -67,6 +71,25 @@ function featureCollectionFor(sede: SedeId, mode: Mode): CoverageFC {
   return (mode === "presencial" ? coverage.presencial : coverage.remoto) as CoverageFC;
 }
 
+function applyPolygonStyle(
+  map: google.maps.Map,
+  selected: string | null,
+  fillKey: Mode | "city",
+) {
+  map.data.setStyle((feature: google.maps.Data.Feature) => {
+    const name = String(feature.getProperty("name") ?? "");
+    const on = Boolean(selected && name === selected);
+    return {
+      fillColor: on ? BRAND_RED_HOT : FILL[fillKey],
+      fillOpacity: on ? 0.55 : 0.34,
+      strokeColor: on ? "#ffffff" : BRAND_STROKE,
+      strokeWeight: on ? 3 : 2,
+      clickable: true,
+      zIndex: on ? 3 : 1,
+    };
+  });
+}
+
 type Props = {
   sede: SedeId;
 };
@@ -74,6 +97,9 @@ type Props = {
 export default function CoverageMap({ sede }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
+  const themeRef = useRef<"light" | "dark">("dark");
+  const selectedRef = useRef<string | null>(null);
+  const fillKeyRef = useRef<Mode | "city">("presencial");
   const { theme } = useTheme();
   const { m, locale } = useI18n();
   const [mode, setMode] = useState<Mode>("presencial");
@@ -86,6 +112,10 @@ export default function CoverageMap({ sede }: Props) {
   const showModeToggle = sede === "villavicencio";
   const activeMode: Mode = showModeToggle ? mode : "presencial";
   const fillKey: Mode | "city" = showModeToggle ? activeMode : "city";
+
+  themeRef.current = theme;
+  selectedRef.current = selected;
+  fillKeyRef.current = fillKey;
 
   useEffect(() => {
     setSelected(null);
@@ -107,19 +137,21 @@ export default function CoverageMap({ sede }: Props) {
       setStatus("error");
     });
 
+    // Language is fixed on first Maps script load; do not remount when locale changes.
     loadGoogleMaps(mapsKey, locale.split("-")[0])
       .then(() => {
         if (cancelled || !host.current) return;
         host.current.innerHTML = "";
+        const mapTheme = themeRef.current;
         const map = new google.maps.Map(host.current, {
           center: { lat: 3.9, lng: -73.2 },
           zoom: 8,
           mapTypeControl: false,
           streetViewControl: false,
           fullscreenControl: true,
-          styles: mapStylesFor(theme),
+          styles: mapStylesFor(mapTheme),
           gestureHandling: "cooperative",
-          backgroundColor: theme === "light" ? "#f4efe8" : "#151010",
+          backgroundColor: mapTheme === "light" ? "#f4efe8" : "#151010",
         });
         mapRef.current = map;
         google.maps.event.addListenerOnce(map, "idle", () => {
@@ -141,7 +173,9 @@ export default function CoverageMap({ sede }: Props) {
       mapRef.current = null;
       if (host.current) host.current.innerHTML = "";
     };
-  }, [retry, mapsKey, locale, m.coverage.errorHint, m.coverage.errorTitle]);
+    // Intentionally omit locale / translated strings: remounting wipes polygons and styles.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- map instance must outlive locale changes
+  }, [retry, mapsKey]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -150,6 +184,8 @@ export default function CoverageMap({ sede }: Props) {
       styles: mapStylesFor(theme),
       backgroundColor: theme === "light" ? "#f4efe8" : "#151010",
     });
+    // setOptions can reset Data styles — re-apply brand red immediately.
+    applyPolygonStyle(map, selectedRef.current, fillKeyRef.current);
   }, [theme, status]);
 
   useEffect(() => {
@@ -158,7 +194,8 @@ export default function CoverageMap({ sede }: Props) {
     map.data.forEach((f) => map.data.remove(f));
     const fc = featureCollectionFor(sede, activeMode);
     map.data.addGeoJson(fc);
-    if (!selected) {
+    applyPolygonStyle(map, selectedRef.current, fillKey);
+    if (!selectedRef.current) {
       const bounds = collectBounds(fc);
       if (bounds) map.fitBounds(bounds, 48);
     }
@@ -171,27 +208,16 @@ export default function CoverageMap({ sede }: Props) {
     return () => {
       google.maps.event.removeListener(listener);
     };
-  }, [sede, activeMode, status, mapGen, theme]);
+  }, [sede, activeMode, status, mapGen, fillKey]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || status !== "ready") return;
-    map.data.setStyle((feature: google.maps.Data.Feature) => {
-      const name = String(feature.getProperty("name") ?? "");
-      const on = Boolean(selected && name === selected);
-      return {
-        fillColor: on ? "#ff1a12" : FILL[fillKey],
-        fillOpacity: on ? 0.55 : 0.34,
-        strokeColor: on ? "#ffffff" : "#ffd4cf",
-        strokeWeight: on ? 3 : 2,
-        clickable: true,
-        zIndex: on ? 3 : 1,
-      };
-    });
+    applyPolygonStyle(map, selected, fillKey);
     const fc = featureCollectionFor(sede, activeMode);
     const bounds = collectBounds(fc, selected);
     if (bounds) map.fitBounds(bounds, selected ? 72 : 48);
-  }, [sede, activeMode, status, selected, fillKey]);
+  }, [sede, activeMode, status, selected, fillKey, mapGen]);
 
   const fallback =
     activeMode === "remoto" && FALLBACK_Q[sede].remoto

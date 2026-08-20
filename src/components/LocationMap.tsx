@@ -57,6 +57,8 @@ export default function LocationMap() {
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | google.maps.marker.AdvancedMarkerElement | null>(null);
   const advancedRef = useRef(false);
+  const themeRef = useRef<"light" | "dark">("dark");
+  const sedeRef = useRef<SedeId>("villavicencio");
   const { theme } = useTheme();
   const { m, interpolate, locale } = useI18n();
   const [sede, setSede] = useState<SedeId>("villavicencio");
@@ -65,6 +67,9 @@ export default function LocationMap() {
   );
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
+
+  themeRef.current = theme;
+  sedeRef.current = sede;
 
   const place = SEDES[sede];
   const iframeSrc = mapsKey
@@ -89,12 +94,15 @@ export default function LocationMap() {
       setStatus("error");
     });
 
+    // Language is fixed on first Maps script load; do not remount when locale changes.
     loadGoogleMaps(mapsKey, locale.split("-")[0])
       .then(async () => {
         if (cancelled || !host.current) return;
         host.current.innerHTML = "";
 
-        const start = SEDES.villavicencio;
+        const startId = sedeRef.current;
+        const start = SEDES[startId];
+        const mapTheme = themeRef.current;
         const baseOpts = {
           center: { lat: start.lat, lng: start.lng },
           zoom: 16,
@@ -104,7 +112,7 @@ export default function LocationMap() {
           streetViewControl: false,
           fullscreenControl: true,
           gestureHandling: "greedy",
-          backgroundColor: theme === "light" ? "#f4efe8" : "#151010",
+          backgroundColor: mapTheme === "light" ? "#f4efe8" : "#151010",
         };
 
         let map: google.maps.Map;
@@ -118,13 +126,13 @@ export default function LocationMap() {
           } catch {
             map = new google.maps.Map(host.current, {
               ...baseOpts,
-              styles: mapStylesFor(theme),
+              styles: mapStylesFor(mapTheme),
             });
           }
         } else {
           map = new google.maps.Map(host.current, {
             ...baseOpts,
-            styles: mapStylesFor(theme),
+            styles: mapStylesFor(mapTheme),
           });
         }
 
@@ -149,7 +157,9 @@ export default function LocationMap() {
         }
         google.maps.event.addListenerOnce(map, "idle", () => {
           google.maps.event.trigger(map, "resize");
-          map.setOptions({ center: { lat: start.lat, lng: start.lng } });
+          // Keep the currently selected sede — never force Villavicencio after idle.
+          const current = SEDES[sedeRef.current];
+          map.setOptions({ center: { lat: current.lat, lng: current.lng } });
         });
         setStatus("ready");
       })
@@ -168,7 +178,9 @@ export default function LocationMap() {
       markerRef.current = null;
       if (host.current) host.current.innerHTML = "";
     };
-  }, [retry, mapsKey, locale, m.map.errorHint, m.map.errorTitle]);
+    // Intentionally omit locale / translated strings: remounting resets the pin to default sede.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- map instance must outlive locale changes
+  }, [retry, mapsKey]);
 
   useEffect(() => {
     const map = mapRef.current;
